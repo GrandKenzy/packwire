@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "docker",
+  "name": "Docker",
+  "aliases": ["docker", "docker-desktop", "docker-ce"],
+  "icon": "🐳",
+  "type": "stable",
+  "category": "development tools",
+  "description": "Plataforma líder de contenedores para compilar, empaquetar, distribuir y ejecutar aplicaciones de forma aislada y reproducible.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (Get-Command winget -ErrorAction SilentlyContinue) { winget install -e --id Docker.DockerDesktop --accept-source-agreements --accept-package-agreements } elseif (Get-Command choco -ErrorAction SilentlyContinue) { choco install docker-desktop -y } else { Start-Process 'https://docs.docker.com/desktop/setup/install/windows-install/' }",
+      "linux": "curl -fsSL https://get.docker.com -o /tmp/get-docker.sh && sudo sh /tmp/get-docker.sh && rm -f /tmp/get-docker.sh || (sudo apt-get update && sudo apt-get install -y docker.io)",
+      "darwin": "which brew >/dev/null 2>&1 && brew install --cask docker || open 'https://docs.docker.com/desktop/setup/install/mac-install/'",
+      "binaries": ["docker.exe", "docker"],
+      "elevated": true
+    },
+    "site": {
+      "url": "https://docs.docker.com/get-docker/"
+    },
+    "clean": true
+  }
+}

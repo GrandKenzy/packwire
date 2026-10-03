@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "git",
+  "name": "Git",
+  "aliases": ["git", "git-scm"],
+  "icon": "🌿",
+  "type": "stable",
+  "category": "development tools",
+  "description": "Sistema de control de versiones distribuido más utilizado en el mundo para rastrear cambios en código fuente.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (Get-Command winget -ErrorAction SilentlyContinue) { winget install --id Git.Git -e --source winget --accept-source-agreements --accept-package-agreements } elseif (Get-Command choco -ErrorAction SilentlyContinue) { choco install git -y } else { Start-Process 'https://git-scm.com/download/win' }",
+      "linux": "which apt-get >/dev/null 2>&1 && sudo apt-get update && sudo apt-get install -y git || which pacman >/dev/null 2>&1 && sudo pacman -S --noconfirm git || which dnf >/dev/null 2>&1 && sudo dnf install -y git || which zypper >/dev/null 2>&1 && sudo zypper install -y git || echo 'Instala git usando el gestor de paquetes de tu distribución'",
+      "darwin": "which brew >/dev/null 2>&1 && brew install git || xcode-select --install || echo 'Instala git vía Homebrew o Xcode Command Line Tools'",
+      "binaries": ["git.exe", "git"],
+      "elevated": false
+    },
+    "site": {
+      "url": "https://git-scm.com/downloads"
+    },
+    "clean": true
+  }
+}

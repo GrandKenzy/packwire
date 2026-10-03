@@ -1,26 +1,28 @@
 # Packwire 📦⚡
 
-Gestor y descargador moderno de paquetes y entornos para Windows.
+Gestor y descargador moderno de paquetes y entornos de desarrollo para Windows, Linux y macOS.
 
 ---
 
 ## 🚀 Características Principales
 
-- **Identificación Canónica sin Colisiones:** Los paquetes usan identificadores canónicos semánticos estructurados (`<nombre>@<canal_o_versión>`, ej. `python@stable`, `python@3.13`), evitando duplicados y colisiones de binarios en el sistema.
+- **Multiplataforma Nativo:** Soporte integral para **Windows** (shims `.cmd`/`.ps1`, registro `HKCU`, accesos directos y UAC), **Linux** (shims POSIX ejecutables, `~/.bashrc`, `.desktop` XDG y `pkexec`/`sudo`) y **macOS** (Safari WebKit, `.command`, `osascript` con privilegios de administrador y Homebrew/Xcode).
+- **Identificación Canónica sin Colisiones:** Los paquetes usan identificadores semánticos estructurados (`<nombre>@<canal_o_versión>`, ej. `python@stable`, `python@3.13`, `git`, `docker`), evitando duplicados y colisiones de binarios en el sistema.
 - **Dos Canales de Versión:**
-  - `stable`: Resuelve dinámicamente la última versión estable oficial del lenguaje (consultando upstream oficial).
+  - `stable`: Resuelve dinámicamente la última versión estable oficial del software (consultando upstream oficial).
   - `fixed`: Pinned a una versión exacta inmutable (ej. 3.12.9, 3.13.2, 3.14.8).
-- **Dos Modos de Instalación:**
+- **Tres Modos de Instalación:**
   - `here`: Descarga e instalación 100% automatizada (headless) usando paquetes embebidos/portables o instaladores silenciosos, sin abrir el navegador.
-  - `site`: Redirige al sitio oficial de descarga para instalación guiada o manual.
+  - `command`: Orquesta instalaciones oficiales por consola con soporte para elevación de privilegios de administrador (UAC en Windows, `osascript` en macOS, `pkexec`/`sudo` en Linux).
+  - `site`: Redirige al sitio oficial de descarga para instalación asistida (ej. Visual Studio Code, Docker Desktop).
 - **Arquitectura de Shims y PATH Limpio:**
-  - En lugar de saturar el registro del sistema con múltiples carpetas en el `PATH`, Packwire mantiene una única carpeta de Shims (`%APPDATA%/packwire/shims`).
-  - Permite que múltiples versiones convivan sin conflicto (`python.cmd`, `python3132.cmd`, `python3129.cmd`).
+  - En lugar de saturar el registro del sistema o archivos de perfil con múltiples carpetas en el `PATH`, Packwire mantiene una única carpeta central de Shims.
+  - Permite que múltiples versiones convivan sin conflicto (`python.cmd`, `python3132.cmd`, `python3129.cmd` en Windows, o scripts ejecutables en Linux/macOS).
 - **Arquitectura de Visitors / Pipeline:**
   - `DownloaderVisitor`: Descarga con barra de progreso, descargas atómicas `.part` y caché.
-  - `PatherVisitor`: Generación de shims y enlace al PATH del usuario (`HKCU\Environment`).
+  - `PatherVisitor`: Generación de shims y enlace al PATH del usuario (`HKCU\Environment` en Windows, `~/.bashrc`/`~/.zshrc` en POSIX).
   - `ManifestVisitor`: Parser tolerante, validador de manifests y cálculo de hash canónico SHA256.
-  - `UninstallerVisitor`: Limpieza de binarios, carpetas y shims.
+  - `UninstallerVisitor`: Limpieza profunda de binarios, carpetas y shims.
   - `UpdaterVisitor`: Detección y aplicación de nuevas versiones para canales `stable`.
 
 ---
@@ -33,27 +35,31 @@ import packwire
 # 1. Instalar última versión estable en modo automático ('here')
 packwire.install("python", channel="stable", mode="here")
 
-# 2. Instalar una versión fija específica
+# 2. Instalar herramientas de desarrollo y contenedores
+packwire.install("git")
+packwire.install("docker")
+
+# 3. Instalar una versión fija específica
 packwire.install("python@3.13", mode="here")
 
-# 3. Redirigir al sitio oficial para descarga manual ('site')
-packwire.install("python@3.14", mode="site")
+# 4. Redirigir al sitio oficial para descarga manual ('site')
+packwire.install("vscode", mode="site")
 
-# 4. Listar paquetes instalados
+# 5. Listar paquetes instalados
 installed = packwire.list_installed()
 print(installed)
 
-# 5. Comprobar actualizaciones disponibles en segundo plano
+# 6. Comprobar actualizaciones disponibles en segundo plano
 updates = packwire.check_updates()
 print(updates)
 
-# 6. Actualizar paquetes estables
+# 7. Actualizar paquetes estables
 packwire.update()
 
-# 7. Reinstalar un paquete
+# 8. Reinstalar un paquete
 packwire.reinstall("python@stable")
 
-# 8. Desinstalar
+# 9. Desinstalar
 packwire.uninstall("python@3.13.2")
 ```
 
@@ -62,31 +68,36 @@ packwire.uninstall("python@3.13.2")
 ## 💻 Uso desde la Terminal (CLI)
 
 ```bash
-# Ver paquetes disponibles
-python -m packwire available
+# Ver paquetes disponibles (Python, GCC, Node, Git, Docker, FFmpeg, etc.)
+packwire available
 
 # Ver información de un paquete resuelto
-python -m packwire info python@stable
+packwire info git
+packwire info docker
 
 # Instalar Python stable en modo headless
-python -m packwire install python --channel stable --mode here
+packwire install python --channel stable --mode here
+
+# Instalar Git o Docker
+packwire install git
+packwire install docker
 
 # Instalar versión fija
-python -m packwire install python@3.12 --mode here
+packwire install python@3.12 --mode here
 
 # Listar instalaciones actuales
-python -m packwire list
+packwire list
 
 # Comprobar actualizaciones
-python -m packwire update
+packwire update
 
 # Desinstalar un paquete
-python -m packwire remove python@3.12.9
+packwire remove python@3.12.9
 
-# Instalar e integrar Packwire en Windows (Shims, PATH, Menú Inicio y Escritorio)
+# Instalar e integrar Packwire en el sistema (Shims, PATH, Menú Inicio y Escritorio)
 packwire setup --desktop
 
-# Compilar ejecutable standalone (.exe)
+# Compilar ejecutable standalone (.exe en Windows)
 packwire build --exe
 
 # Compilar paquete de distribución Python (.whl y .tar.gz)
@@ -114,13 +125,20 @@ packwire ui --web
   ```powershell
   .\install.ps1 -DesktopShortcut
   ```
-- O si ya tienes el paquete o repositorio:
+- O si ya tienes el repositorio:
   ```bash
   pip install -e .
   packwire setup --desktop
   ```
 
-### 2. Generación del Instalador Nativo de Windows (.exe Setup)
+### 2. Instalación Rápida en Linux y macOS
+- Ejecutar el instalador POSIX:
+  ```bash
+  chmod +x install.sh
+  ./install.sh --desktop
+  ```
+
+### 3. Generación del Instalador Nativo de Windows (.exe Setup)
 Packwire incluye un script para compilar un asistente de instalación nativo con **Inno Setup**:
 1. Genera el ejecutable standalone:
    ```bash

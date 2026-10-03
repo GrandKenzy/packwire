@@ -236,12 +236,13 @@ class Installer:
         log(f"Iniciando instalación por comando para '{manifest.name}' ({SYSTEM})...")
 
         # 2. Check elevation
-        if SYSTEM == "windows" and cmd_cfg.elevated:
-            log("⚠️ Este paquete requiere permisos de Administrador. Solicitando elevación UAC en Windows...")
-            temp_script = CACHE_DIR / f"cmd_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.ps1"
-            temp_log = CACHE_DIR / f"log_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.txt"
+        if cmd_cfg.elevated:
+            if SYSTEM == "windows":
+                log("⚠️ Este paquete requiere permisos de Administrador. Solicitando elevación UAC en Windows...")
+                temp_script = CACHE_DIR / f"cmd_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.ps1"
+                temp_log = CACHE_DIR / f"log_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.txt"
 
-            wrapped_script = f"""
+                wrapped_script = f"""
 $ErrorActionPreference = 'Stop'
 try {{
     Start-Transcript -Path '{temp_log}' -Append
@@ -252,33 +253,80 @@ try {{
     exit 1
 }}
 """
-            temp_script.write_text(wrapped_script, encoding="utf-8")
+                temp_script.write_text(wrapped_script, encoding="utf-8")
 
-            uac_ps = [
-                "powershell.exe",
-                "-NoProfile",
-                "-ExecutionPolicy", "Bypass",
-                "-Command",
-                f'Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File \\"{temp_script}\\"" -Verb RunAs -Wait'
-            ]
-            try:
-                log("Esperando confirmación en el cuadro de diálogo UAC...")
-                proc = subprocess.run(uac_ps, capture_output=True, text=True)
-                if temp_log.exists():
-                    log_content = temp_log.read_text(encoding="utf-8", errors="replace")
-                    for line in log_content.splitlines():
-                        if line.strip():
-                            log(line)
+                uac_ps = [
+                    "powershell.exe",
+                    "-NoProfile",
+                    "-ExecutionPolicy", "Bypass",
+                    "-Command",
+                    f'Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File \\"{temp_script}\\"" -Verb RunAs -Wait'
+                ]
+                try:
+                    log("Esperando confirmación en el cuadro de diálogo UAC...")
+                    proc = subprocess.run(uac_ps, capture_output=True, text=True)
+                    if temp_log.exists():
+                        log_content = temp_log.read_text(encoding="utf-8", errors="replace")
+                        for line in log_content.splitlines():
+                            if line.strip():
+                                log(line)
+                        temp_log.unlink(missing_ok=True)
+                    temp_script.unlink(missing_ok=True)
+
+                    if proc.returncode != 0:
+                        return False, "El comando elevado finalizó con error o la elevación fue cancelada por el usuario."
+                    log("Comando elevado completado exitosamente.")
+                except Exception as e:
+                    temp_script.unlink(missing_ok=True)
                     temp_log.unlink(missing_ok=True)
-                temp_script.unlink(missing_ok=True)
+                    return False, f"Fallo al invocar UAC: {e}"
 
-                if proc.returncode != 0:
-                    return False, "El comando elevado finalizó con error o la elevación fue cancelada por el usuario."
-                log("Comando elevado completado exitosamente.")
-            except Exception as e:
-                temp_script.unlink(missing_ok=True)
-                temp_log.unlink(missing_ok=True)
-                return False, f"Fallo al invocar UAC: {e}"
+            elif SYSTEM == "darwin":
+                log("⚠️ Este paquete requiere permisos de Administrador. Solicitando autorización en macOS...")
+                escaped_script = script.replace("\\", "\\\\").replace('"', '\\"')
+                osa_cmd = [
+                    "osascript",
+                    "-e",
+                    f'do shell script "{escaped_script}" with administrator privileges'
+                ]
+                try:
+                    proc = subprocess.run(osa_cmd, capture_output=True, text=True)
+                    if proc.returncode != 0:
+                        return False, f"Fallo en la autorización o comando de macOS: {proc.stderr}"
+                    log("Comando completado exitosamente con privilegios en macOS.")
+                except Exception as e:
+                    return False, f"Fallo al invocar autorización en macOS: {e}"
+
+            elif SYSTEM == "linux":
+                log("⚠️ Este paquete requiere permisos de Administrador (root) en Linux...")
+                import os
+                is_root = (os.geteuid() == 0) if hasattr(os, "geteuid") else False
+                if is_root:
+                    args = ["/bin/bash", "-c", script]
+                elif shutil.which("pkexec") and os.environ.get("DISPLAY"):
+                    args = ["pkexec", "/bin/bash", "-c", script]
+                else:
+                    args = ["sudo", "/bin/bash", "-c", script]
+
+                try:
+                    proc = subprocess.Popen(
+                        args,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        bufsize=1,
+                        universal_newlines=True
+                    )
+                    for line in proc.stdout:
+                        clean = line.rstrip()
+                        if clean:
+                            log(clean)
+                    proc.wait()
+                    if proc.returncode != 0:
+                        return False, f"El comando elevado finalizó con código de error {proc.returncode}"
+                    log("Comando elevado completado exitosamente en Linux.")
+                except Exception as e:
+                    return False, f"Error al ejecutar comando elevado en Linux: {e}"
         else:
             # Standard streaming execution
             shell_name = cmd_cfg.shell or ("powershell" if SYSTEM == "windows" else "bash")

@@ -99,9 +99,16 @@ def install_self(
             gui_target = target_executable
             gui_args = "ui"
 
-    cmd_shim.write_text(cmd_content, encoding="utf-8")
-    ps1_shim.write_text(ps1_content, encoding="utf-8")
-    messages.append(f"Lanzador shim creado en {cmd_shim}")
+    if SYSTEM == "windows":
+        cmd_shim.write_text(cmd_content, encoding="utf-8")
+        ps1_shim.write_text(ps1_content, encoding="utf-8")
+        messages.append(f"Lanzador shim creado en {cmd_shim}")
+    else:
+        posix_shim = SHIMS_DIR / "packwire"
+        posix_content = f'#!/bin/sh\nexec "{str(python_exe)}" -m packwire "$@"\n'
+        posix_shim.write_text(posix_content, encoding="utf-8")
+        posix_shim.chmod(0o755)
+        messages.append(f"Lanzador POSIX creado en {posix_shim}")
 
     # 2. Add SHIMS_DIR to User PATH
     if add_to_path:
@@ -110,23 +117,63 @@ def install_self(
         else:
             messages.append("El directorio de shims ya estaba en el PATH o no requirió cambios.")
 
-    # 3. Create Start Menu Shortcut (opens GUI by default)
-    if create_start_menu and SYSTEM == "windows":
-        app_data = os.environ.get("APPDATA")
-        if app_data:
-            start_menu_dir = Path(app_data) / "Microsoft" / "Windows" / "Start Menu" / "Programs"
-            shortcut_file = start_menu_dir / "Packwire.lnk"
-            if create_windows_shortcut(gui_target, shortcut_file, arguments=gui_args, icon_path=ico_path, description="Packwire Package Manager"):
-                messages.append(f"Acceso directo creado en Menú Inicio: {shortcut_file.name}")
+    # 3. Create Start Menu / Application Shortcuts
+    png_path = root_dir / "packwire" / "core" / "gui" / "web" / "logo.png"
+
+    if create_start_menu:
+        if SYSTEM == "windows":
+            app_data = os.environ.get("APPDATA")
+            if app_data:
+                start_menu_dir = Path(app_data) / "Microsoft" / "Windows" / "Start Menu" / "Programs"
+                shortcut_file = start_menu_dir / "Packwire.lnk"
+                if create_windows_shortcut(gui_target, shortcut_file, arguments=gui_args, icon_path=ico_path, description="Packwire Package Manager"):
+                    messages.append(f"Acceso directo creado en Menú Inicio: {shortcut_file.name}")
+        elif SYSTEM == "linux":
+            app_dir = Path.home() / ".local" / "share" / "applications"
+            app_dir.mkdir(parents=True, exist_ok=True)
+            desktop_file = app_dir / "packwire.desktop"
+            desktop_entry = f"""[Desktop Entry]
+Type=Application
+Name=Packwire
+Comment=Packwire Package Manager
+Exec={sys.executable} -m packwire ui
+Icon={png_path if png_path.exists() else 'package-x-generic'}
+Terminal=false
+Categories=Development;System;
+"""
+            desktop_file.write_text(desktop_entry, encoding="utf-8")
+            messages.append(f"Entrada de aplicación creada en: {desktop_file}")
 
     # 4. Optional Desktop Shortcut
-    if create_desktop and SYSTEM == "windows":
-        user_profile = os.environ.get("USERPROFILE")
-        if user_profile:
-            desktop_dir = Path(user_profile) / "Desktop"
-            shortcut_file = desktop_dir / "Packwire.lnk"
-            if create_windows_shortcut(gui_target, shortcut_file, arguments=gui_args, icon_path=ico_path, description="Packwire Package Manager"):
-                messages.append(f"Acceso directo creado en el Escritorio: {shortcut_file.name}")
+    if create_desktop:
+        desktop_dir = Path.home() / "Desktop"
+        if SYSTEM == "windows":
+            user_profile = os.environ.get("USERPROFILE")
+            if user_profile:
+                desktop_dir = Path(user_profile) / "Desktop"
+                shortcut_file = desktop_dir / "Packwire.lnk"
+                if create_windows_shortcut(gui_target, shortcut_file, arguments=gui_args, icon_path=ico_path, description="Packwire Package Manager"):
+                    messages.append(f"Acceso directo creado en el Escritorio: {shortcut_file.name}")
+        elif SYSTEM == "linux" and desktop_dir.exists():
+            desktop_file = desktop_dir / "packwire.desktop"
+            desktop_entry = f"""[Desktop Entry]
+Type=Application
+Name=Packwire
+Comment=Packwire Package Manager
+Exec={sys.executable} -m packwire ui
+Icon={png_path if png_path.exists() else 'package-x-generic'}
+Terminal=false
+Categories=Development;System;
+"""
+            desktop_file.write_text(desktop_entry, encoding="utf-8")
+            desktop_file.chmod(0o755)
+            messages.append(f"Acceso directo creado en el Escritorio: {desktop_file.name}")
+        elif SYSTEM == "darwin" and desktop_dir.exists():
+            cmd_file = desktop_dir / "Packwire.command"
+            cmd_content = f'#!/bin/sh\nexec "{sys.executable}" -m packwire ui\n'
+            cmd_file.write_text(cmd_content, encoding="utf-8")
+            cmd_file.chmod(0o755)
+            messages.append(f"Acceso directo creado en el Escritorio: {cmd_file.name}")
 
     summary = "¡Packwire instalado e integrado con éxito!\n" + "\n".join(f"• {m}" for m in messages)
     return True, summary

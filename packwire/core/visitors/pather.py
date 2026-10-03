@@ -37,21 +37,43 @@ class PatherVisitor:
         created_shims: List[str] = []
 
         for b in binaries:
-            target_exe = (target_dir / b).resolve()
-            if not target_exe.exists():
-                # Check with or without .exe, in bin folder, or recursively
-                if SYSTEM == "windows" and (target_dir / f"{b}.exe").exists():
-                    target_exe = (target_dir / f"{b}.exe").resolve()
-                elif (target_dir / "bin" / b).exists():
-                    target_exe = (target_dir / "bin" / b).resolve()
-                elif SYSTEM == "windows" and (target_dir / "bin" / f"{b}.exe").exists():
-                    target_exe = (target_dir / "bin" / f"{b}.exe").resolve()
+            stem = Path(b).stem
+            candidates_to_try = [b]
+            if SYSTEM == "windows":
+                if not b.endswith(".exe"):
+                    candidates_to_try.append(f"{b}.exe")
+            else:
+                if b.endswith(".exe"):
+                    candidates_to_try.insert(0, stem)
                 else:
-                    candidates = list(target_dir.rglob(b))
-                    if not candidates and SYSTEM == "windows":
-                        candidates = list(target_dir.rglob(f"{b}.exe"))
-                    if candidates:
-                        target_exe = candidates[0].resolve()
+                    candidates_to_try.append(stem)
+
+            target_exe = None
+            for cand in candidates_to_try:
+                if (target_dir / cand).exists():
+                    target_exe = (target_dir / cand).resolve()
+                    break
+                elif (target_dir / "bin" / cand).exists():
+                    target_exe = (target_dir / "bin" / cand).resolve()
+                    break
+
+            if not target_exe:
+                for cand in candidates_to_try:
+                    found = list(target_dir.rglob(cand))
+                    if found:
+                        target_exe = found[0].resolve()
+                        break
+
+            if not target_exe:
+                target_exe = (target_dir / b).resolve()
+
+            # Ensure target binary is executable on POSIX platforms
+            if SYSTEM != "windows" and target_exe.exists():
+                try:
+                    cur_mode = target_exe.stat().st_mode
+                    target_exe.chmod(cur_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                except Exception:
+                    pass
 
             base_name = Path(b).stem.lower()
 

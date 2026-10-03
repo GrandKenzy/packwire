@@ -173,6 +173,20 @@ class TestPackwire(unittest.TestCase):
         self.assertIsNotNone(csharp)
         self.assertEqual(csharp["install"]["mode"], "command")
 
+        # Test git
+        git_pkg = packwire.get_manifest("git")
+        self.assertIsNotNone(git_pkg)
+        self.assertEqual(git_pkg["id"], "git")
+        self.assertIn("git", git_pkg["aliases"])
+        self.assertEqual(git_pkg["install"]["mode"], "command")
+
+        # Test docker
+        docker_pkg = packwire.get_manifest("docker")
+        self.assertIsNotNone(docker_pkg)
+        self.assertEqual(docker_pkg["id"], "docker")
+        self.assertIn("docker-desktop", docker_pkg["aliases"])
+        self.assertTrue(docker_pkg["install"]["command"]["elevated"])
+
     def test_task_queue(self):
         import packwire
         from packwire.core.task_queue import task_queue

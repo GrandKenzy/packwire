@@ -20,6 +20,24 @@
     "site": {
       "url": "https://www.python.org/downloads/"
     },
-    "clean": true
+    "clean": true,
+    "os": {
+      "linux": {
+        "mode": "command",
+        "command": {
+          "script": "which apt-get >/dev/null 2>&1 && sudo apt-get update && sudo apt-get install -y python3 python3-pip || which pacman >/dev/null 2>&1 && sudo pacman -S --noconfirm python python-pip || which dnf >/dev/null 2>&1 && sudo dnf install -y python3 python3-pip || echo 'Instala Python mediante tu gestor de paquetes'",
+          "binaries": ["python3", "python", "pip3", "pip"],
+          "elevated": true
+        }
+      },
+      "darwin": {
+        "mode": "command",
+        "command": {
+          "script": "which brew >/dev/null 2>&1 && brew install python || echo 'Instala Python con Homebrew (brew install python)'",
+          "binaries": ["python3", "python", "pip3", "pip"],
+          "elevated": false
+        }
+      }
+    }
   }
 }
