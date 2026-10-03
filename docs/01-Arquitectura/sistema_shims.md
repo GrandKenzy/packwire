@@ -1,8 +1,8 @@
 # Sistema de Shims y Gestión de PATH
 
-El subsistema de shims es el componente central de integración entre los paquetes gestionados por Packwire y la consola de comandos de Windows. Se encuentra implementado en la clase `PatherVisitor` dentro de [`packwire/core/visitors/pather.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/visitors/pather.py) y se apoya en las constantes de ruta definidas en [`packwire/core/config.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/config.py).
+El subsistema de shims es el componente central de integración entre los paquetes gestionados por Packwire y las terminales del sistema operativo (Windows, Linux y macOS). Se encuentra implementado en la clase `PatherVisitor` dentro de [`packwire/core/visitors/pather.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/visitors/pather.py) y se apoya en las constantes de ruta definidas en [`packwire/core/config.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/config.py).
 
-Este diseño resuelve uno de los problemas históricos más graves en la administración de entornos de desarrollo en Windows: la degradación y corrupción de la variable de entorno `PATH` por saturación de entradas de diferentes instaladores, colisiones de nombres binarios y el límite de longitud en el registro de Windows.
+Este diseño resuelve uno de los problemas históricos más graves en la administración de entornos de desarrollo: la degradación y saturación de la variable de entorno `PATH` por múltiples instaladores, colisiones de nombres binarios y desorden en el registro o perfiles de usuario.
 
 ---
 
@@ -36,29 +36,28 @@ class PatherVisitor:
 | Parámetro | Tipo | Requerido | Descripción |
 | :--- | :--- | :--- | :--- |
 | `target_dir` | `Path` | Sí | Directorio raíz donde reside la aplicación instalada. |
-| `binaries` | `List[str]` | Sí | Lista de nombres de ejecutables a enlazar (ej. `["python.exe", "pip.exe"]`). |
+| `binaries` | `List[str]` | Sí | Lista de nombres de ejecutables a enlazar (ej. `["python.exe", "pip.exe"]` o `["git", "docker"]`). |
 | `version_suffix` | `Optional[str]` | No | Sufijo numérico o alfanumérico para generar nombres alternativos con versión fija. |
-| `is_default` | `bool` | No | Si es `True`, genera además el shim con el nombre base canónico (ej. `python.cmd`). |
+| `is_default` | `bool` | No | Si es `True`, genera además el shim con el nombre base canónico (ej. `python.cmd` o `python`). |
 
 * **Retorno:** `List[str]` con los nombres de todos los archivos shim efectivamente generados en disco.
 
 ---
 
-## 🔍 Mecánica de Enlace y Proxying
+## 🔍 Mecánica de Enlace y Proxying Multiplataforma
 
 En lugar de agregar la carpeta de cada paquete instalado a la variable global `PATH`, Packwire inyecta una única ruta permanente en el perfil del usuario:
 
-```
-%APPDATA%\packwire\shims
-```
+* **En Windows:** `%APPDATA%\packwire\shims`
+* **En Linux y macOS:** `~/.local/share/packwire/shims`
 
-Cuando un paquete como Python 3.14 es instalado, `PatherVisitor` no expone `%APPDATA%\packwire\apps\python-3.14\`, sino que compila lanzadores proxy ligeros dentro de la carpeta de shims:
+Cuando un paquete como Python 3.14 es instalado, `PatherVisitor` no expone la ruta interna de extracción, sino que compila lanzadores proxy ligeros dentro de la carpeta de shims:
 
 ```
-%APPDATA%\packwire\shims\
-├── python.cmd
-├── python.ps1
-├── python314.cmd
+[Windows] %APPDATA%\packwire\shims\      [POSIX] ~/.local/share/packwire/shims/
+├── python.cmd                           ├── python
+├── python.ps1                           ├── python314
+├── python314.cmd                        └── python-3.14
 ├── python314.ps1
 ├── python-3.14.cmd
 └── python-3.14.ps1
@@ -79,28 +78,26 @@ El modificador `%*` propaga la totalidad de argumentos pasados en la terminal de
 ```
 El operador de llamada `&` ejecuta el binario delegando el array de parámetros `$args`.
 
-#### 3. Soporte Multiplataforma (POSIX / Linux / macOS)
+#### 3. Soporte Multiplataforma POSIX (Linux / macOS)
 En sistemas Unix-like, se genera un script ejecutable sin extensión con directiva hashbang y permisos `0755` (`rwxr-xr-x`):
 ```sh
 #!/bin/sh
 exec "/home/usuario/.local/share/packwire/apps/python-3.14/bin/python" "$@"
 ```
+`PatherVisitor` normaliza automáticamente los nombres eliminando extensiones `.exe` en Linux/macOS y aplicando bits de ejecución (`stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH`) tanto al binario destino como al shim generado.
 
 ---
 
-## ⚙️ Inyección en Registro y Difusión Windows
+## ⚙️ Registro y Persistencia en `PATH`
 
-Para registrar la carpeta de shims sin requerir permisos de Administrador ni reiniciar el equipo, `PatherVisitor.add_shims_to_user_path()` ejecuta un protocolo en dos fases:
+Para garantizar disponibilidad global sin requerir permisos de superusuario ni reiniciar la máquina, `PatherVisitor.add_shims_to_user_path()` implementa estrategias nativas por plataforma:
 
-### 1. Manipulación del Registro de Usuario
-Accede mediante el módulo nativo `winreg` a la clave:
+### 1. Entorno Windows: Registro y Difusión `WM_SETTINGCHANGE`
+Accede mediante el módulo nativo `winreg` a:
 ```
 HKEY_CURRENT_USER\Environment
 ```
-Lee el valor de tipo `REG_EXPAND_SZ` o `REG_SZ` denominado `Path`, normaliza la lista de rutas separadas por punto y coma (`;`), antepone `%APPDATA%\packwire\shims` al inicio de la cadena para asegurar máxima precedencia y escribe el valor actualizado.
-
-### 2. Difusión de Mensaje del Sistema (`WM_SETTINGCHANGE`)
-Para que los procesos nuevos y el shell de Windows Explorer reconozcan la modificación sin reiniciar la sesión, se realiza una invocación a la API nativa de Win32 mediante `ctypes`:
+Lee el valor `Path`, antepone `%APPDATA%\packwire\shims` al inicio de la cadena para asegurar precedencia y escribe el valor actualizado. Inmediatamente, notifica a los procesos del sistema mediante la Win32 API:
 
 ```python
 HWND_BROADCAST = 0xFFFF
@@ -119,13 +116,26 @@ ctypes.windll.user32.SendMessageTimeoutW(
 )
 ```
 
+### 2. Entorno POSIX (Linux y macOS): Perfiles de Shell
+Examina de forma idempotente los archivos de inicialización del shell del usuario:
+* `~/.zshrc` (macOS y distribuciones modernas con Zsh)
+* `~/.bashrc` (distribuciones Linux estándar con Bash)
+* `~/.profile` (sesiones POSIX genéricas)
+
+Si la ruta no se encuentra presente, anexa la instrucción de exportación:
+```bash
+export PATH="/home/usuario/.local/share/packwire/shims:$PATH"
+```
+Al desinstalar (`remove_shims_from_user_path`), el sistema filtra y elimina de forma limpia dicha línea de los archivos de configuración sin alterar el resto del entorno.
+
 ---
 
 ## ⚠️ Consideraciones Críticas y Casos de Borde
 
-1. **Políticas de Ejecución en PowerShell (`ExecutionPolicy`):** En Windows donde la política sea `Restricted`, la invocación de `packwire.ps1` puede verse rechazada. Por este motivo, `PatherVisitor` siempre genera en paralelo el archivo `.cmd`, el cual Windows ejecuta de forma prioritaria en terminales estándar de comandos sin restricciones de firma digital.
-2. **Duplicación de Rutas en el Registro:** El método analiza la cadena existente con comparaciones de rutas absolutas normalizadas en minúsculas para prevenir entradas repetidas.
-3. **Desinstalación y Limpieza:** Al invocar `remove_shims()`, el sistema elimina todos los alias derivados (`.cmd`, `.ps1` y variantes con versión) asegurando que no queden comandos huérfanos que apunten a ejecutables eliminados.
+1. **Políticas de Ejecución en PowerShell (`ExecutionPolicy`):** En entornos Windows con directiva `Restricted`, la invocación directa de `.ps1` puede verse bloqueada. `PatherVisitor` siempre genera en paralelo el archivo `.cmd`, el cual Windows ejecuta de forma prioritaria en terminales estándar sin restricciones de firma digital.
+2. **Permisos de Ejecución en Archivos POSIX:** Al extraer archivos `.zip` o `.tar.gz` en Linux/macOS, los binarios pueden perder los atributos de ejecución. `PatherVisitor` analiza los ejecutables destino y aplica forzosamente `chmod +x` antes de vincular el shim.
+3. **Resolución Binaria en Carpetas `bin/`:** Si el archivo ejecutable no reside directamente en la raíz del paquete sino dentro de un subdirectorio `bin/` (patrón común en GCC, Node.js y Git), el visitante realiza una búsqueda recursiva para localizar el binario real antes de generar el shim.
+4. **Desinstalación y Limpieza:** Al invocar `remove_shims()`, el sistema elimina todos los alias derivados (`.cmd`, `.ps1`, variantes con versión y shims POSIX sin extensión) asegurando que no queden comandos huérfanos.
 
 ---
 
@@ -138,16 +148,16 @@ from packwire.core.visitors.pather import PatherVisitor
 # Instanciar el gestor de shims
 pather = PatherVisitor()
 
-# Verificar estado en el entorno actual
+# Verificar y asegurar que los shims estén en el PATH del sistema
 if not pather.is_shims_in_path():
     print("[*] Registrando shims en PATH del usuario...")
     pather.add_shims_to_user_path()
 
-# Generar shims para una instalación manual de GCC
-bin_dir = Path("C:/herramientas/w64devkit/bin")
+# Generar shims para una instalación de herramientas de compilación
+bin_dir = Path("/opt/packwire/apps/c-gcc/bin")
 shims = pather.create_shims(
     target_dir=bin_dir,
-    binaries=["gcc.exe", "g++.exe", "make.exe"],
+    binaries=["gcc", "g++", "make"],
     version_suffix="14.2.0",
     is_default=True
 )

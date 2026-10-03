@@ -1,8 +1,8 @@
 # Integración y Auto-Instalación en el Sistema
 
-El subsistema de auto-instalación provee las herramientas necesarias para configurar Packwire como un comando de primer orden en el sistema operativo Windows. Se implementa en [`packwire/installer_self.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/installer_self.py) y se expone tanto en la CLI (`packwire setup`) como a través de los scripts de arranque rápido [`install.bat`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.bat) y [`install.ps1`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.ps1).
+El subsistema de auto-instalación provee las herramientas necesarias para configurar Packwire como un comando de primer orden en el sistema operativo del usuario (Windows, Linux y macOS). Se implementa en [`packwire/installer_self.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/installer_self.py) y se expone tanto en la CLI (`packwire setup`) como a través de los scripts de arranque rápido [`install.bat`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.bat), [`install.ps1`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.ps1) e [`install.sh`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.sh).
 
-A diferencia de los instaladores tradicionales que requieren derechos administrativos obligatorios, la integración de Packwire opera íntegramente dentro del espacio del usuario actual (`HKCU` y `%APPDATA%`), evitando solicitar permisos de elevación UAC para la operativa ordinaria.
+A diferencia de los instaladores tradicionales que requieren derechos administrativos obligatorios para registrar binarios, la integración de Packwire opera íntegramente dentro del espacio del usuario actual (`HKCU` y `%APPDATA%` en Windows; `~/.local/share/packwire` y archivos de configuración de shell en Linux y macOS), evitando solicitar permisos de elevación para la operativa estándar del gestor.
 
 ---
 
@@ -30,41 +30,76 @@ def install_self(
 
 | Parámetro | Tipo | Requerido | Descripción |
 | :--- | :--- | :--- | :--- |
-| `add_to_path` | `bool` | No | Si es `True`, inyecta la carpeta de shims en la variable `PATH` de usuario en el registro. |
-| `create_start_menu`| `bool` | No | Si es `True`, genera el acceso directo en el Menú Inicio del usuario. |
-| `create_desktop` | `bool` | No | Si es `True`, crea un acceso directo de la interfaz gráfica en el Escritorio. |
+| `add_to_path` | `bool` | No | Si es `True`, inyecta la carpeta de shims en la variable `PATH` del usuario (registro en Windows o `.bashrc`/`.zshrc` en POSIX). |
+| `create_start_menu`| `bool` | No | Si es `True`, genera el acceso en el Menú Inicio (Windows) o la entrada `.desktop` en el menú de aplicaciones del sistema (Linux). |
+| `create_desktop` | `bool` | No | Si es `True`, crea un acceso directo de la interfaz gráfica en el Escritorio del usuario. |
 
 * **Retorno:** Tupla `Tuple[bool, str]` confirmando el estado de la integración y el desglose de acciones efectuadas.
 
 ---
 
-## 🔍 Fases de la Integración
+## 🔍 Fases de la Integración Multiplataforma
 
 ### 1. Compilación de Shims Maestros
-Genera los archivos de enlace global en `%APPDATA%\packwire\shims`:
-* `packwire.cmd`: Envoltorio para CMD.
-* `packwire.ps1`: Envoltorio para PowerShell.
+Genera los archivos de enlace global en el directorio central de shims (`%APPDATA%\packwire\shims` en Windows, `~/.local/share/packwire/shims` en Linux/macOS):
 
-Si Packwire se ejecuta desde código fuente o paquete pip, los shims invocan `python.exe -m packwire %*`. Si se ejecuta desde un binario standalone compilado, apuntan directamente a la ruta física de `packwire.exe`.
+* **En Windows:**
+  * `packwire.cmd`: Envoltorio para consola CMD estándar.
+  * `packwire.ps1`: Envoltorio para PowerShell.
+  Si Packwire opera desde código fuente o paquete editable, los shims invocan `python.exe -m packwire %*`. Si se ejecuta desde un binario standalone congelado, apuntan directamente a la ruta física de `packwire.exe`.
+
+* **En Linux y macOS:**
+  * `packwire`: Script POSIX sin extensión, dotado de permisos de ejecución `0755` (`rwxr-xr-x`):
+    ```sh
+    #!/bin/sh
+    exec "/ruta/al/python" -m packwire "$@"
+    ```
 
 ### 2. Registro en la Variable `PATH` del Usuario
-Invoca `PatherVisitor.add_shims_to_user_path()`, insertando la carpeta de shims en `HKEY_CURRENT_USER\Environment\Path` y difundiendo el mensaje de sistema `WM_SETTINGCHANGE` para que cualquier nueva terminal reconozca el comando `packwire` de inmediato.
+Invoca `PatherVisitor.add_shims_to_user_path()`, adaptando la persistencia según la arquitectura anfitriona:
+* **En Windows:** Inserta la carpeta de shims en `HKEY_CURRENT_USER\Environment\Path` y difunde el mensaje de sistema `WM_SETTINGCHANGE` mediante la API nativa de Win32 (`SendMessageTimeoutW`).
+* **En Linux y macOS:** Examina los archivos de perfil del usuario (`~/.zshrc`, `~/.bashrc`, `~/.profile`) y agrega la directiva:
+  ```bash
+  export PATH="$HOME/.local/share/packwire/shims:$PATH"
+  ```
+  asegurando precedencia inmediata en nuevas sesiones de terminal.
 
-### 3. Creación de Accesos Directos Silenciosos (`pythonw.exe`)
-Para los accesos directos de la interfaz gráfica en el **Menú Inicio** (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Packwire.lnk`) y en el **Escritorio**, el sistema analiza el entorno:
-* En entornos Python no congelados, el acceso directo enlaza a:
-  ```
-  Target:    C:\...\Python314\pythonw.exe
-  Arguments: -m packwire ui
-  ```
-  El uso de `pythonw.exe` es crítico: ejecuta la interfaz gráfica sin desplegar la clásica ventana negra de consola detrás del dashboard.
-* Se adjunta el icono oficial extraído o compilado en `logo.ico`.
+### 3. Creación de Accesos Directos e Integración Gráfica
+Para proveer acceso a la interfaz gráfica sin terminal de fondo:
+
+* **En Windows (`pythonw.exe`):**
+  * **Menú Inicio:** `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Packwire.lnk`
+  * **Escritorio:** `%USERPROFILE%\Desktop\Packwire.lnk`
+  * En entornos Python estándar enlaza hacia `pythonw.exe -m packwire ui`, impidiendo que se despliegue la ventana negra de consola detrás del dashboard visual. Se asocia con el icono binario `logo.ico`.
+
+* **En Linux (Especificación XDG Desktop Entry):**
+  * **Lanzador de Aplicaciones:** `~/.local/share/applications/packwire.desktop`
+  * **Escritorio:** `~/Desktop/packwire.desktop` (con permisos de ejecución `0755`)
+  * Estructura generada:
+    ```ini
+    [Desktop Entry]
+    Type=Application
+    Name=Packwire
+    Comment=Packwire Package Manager
+    Exec=/usr/bin/python3 -m packwire ui
+    Icon=/ruta/a/packwire/core/gui/web/logo.png
+    Terminal=false
+    Categories=Development;System;
+    ```
+
+* **En macOS (Acceso Directo `.command`):**
+  * **Escritorio:** `~/Desktop/Packwire.command` (con permisos `0755`)
+  * Estructura generada:
+    ```sh
+    #!/bin/sh
+    exec "/usr/local/bin/python3" -m packwire ui
+    ```
 
 ---
 
 ## 📦 Scripts de Aprovisionamiento Rápido
 
-### `install.bat` (Instalador de Un Clic)
+### `install.bat` (Instalador de Un Clic para Windows)
 Permite instalar Packwire simplemente haciendo doble clic desde el Explorador de Archivos de Windows:
 1. Verifica si `python` está presente en el `PATH` del sistema.
 2. Invoca `install.ps1` con la bandera de bypass de políticas de ejecución:
@@ -79,21 +114,33 @@ Automatiza la instalación de dependencias en modo editable (`pip install -e .`)
 * `-NoStartMenu`: Omite el acceso en el menú de programas.
 * `-NoPath`: Omite la modificación del `PATH`.
 
+### `install.sh` (Script Automatizado POSIX para Linux y macOS)
+Permite la instalación integral en sistemas Unix con un solo comando:
+1. Detecta automáticamente la presencia de `python3` o `python` y el gestor de paquetes `pip`.
+2. Actualiza `pip` e instala el proyecto en modo editable (`pip install -e .`).
+3. Invoca `python3 -m packwire setup` propagando las opciones `--desktop`, `--no-start-menu` o `--no-path`.
+4. Informa la ruta de los shims y confirma la activación inmediata de la CLI.
+
 ---
 
 ## ⚠️ Consideraciones Críticas y Casos de Borde
 
 1. **Restricción de Scripting en PowerShell:** Muchos equipos Windows bloquean la ejecución de scripts `.ps1` mediante la directiva `Restricted`. Tanto `install.bat` como el creador de accesos directos ejecutan PowerShell con `-NoProfile -ExecutionPolicy Bypass`, garantizando que la instalación proceda sin interrupciones por directivas de seguridad locales.
-2. **Generación Automática del Icono ICO:** Si el archivo binario `logo.ico` no se encuentra en el repositorio, `packwire.packager.ensure_icon()` lo sintetiza dinámicamente a partir del archivo PNG embebido sin necesidad de librerías externas como Pillow.
+2. **Generación Dinámica del Icono:** Si el archivo binario `logo.ico` no se encuentra en el repositorio, `packwire.packager.ensure_icon()` lo sintetiza dinámicamente a partir del archivo PNG embebido sin necesidad de librerías externas como Pillow.
+3. **Persistencia en Shells POSIX:** En Linux y macOS, si el usuario utiliza shells no tradicionales (como `fish`), la entrada en `~/.bashrc` o `~/.zshrc` puede requerir declarar manualmente `set -gx PATH "$HOME/.local/share/packwire/shims" $PATH`.
 
 ---
 
 ## 💡 Ejemplo de Uso en Terminal
 
 ```bash
-# Configuración estándar con acceso en el escritorio
+# Configuración estándar en Windows, Linux o macOS con acceso en el escritorio
 packwire setup --desktop
 
-# Configuración mínima solo para terminal (sin accesos directos)
+# Configuración mínima solo para terminal (sin accesos directos de menú)
 packwire setup --no-start-menu
+
+# Ejecución del instalador universal en Linux / macOS
+chmod +x install.sh
+./install.sh --desktop
 ```

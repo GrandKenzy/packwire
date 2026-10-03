@@ -77,7 +77,7 @@ Esta misma lógica se aplica rigurosamente en `server.py` (`get_web_dir`) y `bri
 
 ---
 
-## 🎨 Generación Sintética de Icono ICO en Python Puro
+## ⚙️ Generación Sintética de Icono ICO en Python Puro
 
 Para evitar añadir dependencias pesadas de procesamiento de imágenes (como Pillow) únicamente para generar el icono de Windows, `packwire.packager.ensure_icon()` implementa el estándar formal de encabezados ICO de Microsoft estructurando los bytes en bajo nivel mediante `struct`:
 

@@ -93,7 +93,7 @@ class PackageState:
 
 ---
 
-## 🔒 Algoritmo Determinista de Hash Canónico (`calculate_hash`)
+## ⚙️ Algoritmo Determinista de Hash Canónico (`calculate_hash`)
 
 Para garantizar que dos manifiestos con ligeras variaciones de formato o campos no esenciales (como espacios o descripción) no produzcan identidades inconsistentes, `Manifest.calculate_hash()` normaliza los campos determinantes antes de invocar la función de hash:
 
@@ -134,7 +134,9 @@ Esta función garantiza idempotencia matemática: cualquier modificación en la 
 
 ---
 
-## 💡 Ejemplo de Declaración de Manifiesto en JSON
+## 💡 Ejemplos de Declaración de Manifiestos en JSON
+
+### 1. Despliegue Autónomo Portable (`mode: here`)
 
 ```json
 {
@@ -155,6 +157,35 @@ Esta función garantiza idempotencia matemática: cualquier modificación en la 
       "binaries": ["gcc.exe", "g++.exe", "gdb.exe", "make.exe"],
       "addpath": true
     }
+  }
+}
+```
+
+### 2. Despliegue Multiplataforma con Elevación (`mode: command`)
+
+```json
+{
+  "$schema": "packwire-v1",
+  "id": "git",
+  "name": "Git",
+  "aliases": ["git", "git-scm"],
+  "icon": "🌿",
+  "type": "stable",
+  "category": "development tools",
+  "description": "Sistema de control de versiones distribuido con orquestación multi-OS.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (Get-Command winget -ErrorAction SilentlyContinue) { winget install --id Git.Git -e --source winget } elseif (Get-Command choco -ErrorAction SilentlyContinue) { choco install git -y }",
+      "linux": "which apt-get >/dev/null 2>&1 && sudo apt-get update && sudo apt-get install -y git || which pacman >/dev/null 2>&1 && sudo pacman -S --noconfirm git || sudo dnf install -y git",
+      "darwin": "which brew >/dev/null 2>&1 && brew install git || xcode-select --install",
+      "binaries": ["git.exe", "git"],
+      "elevated": false
+    },
+    "site": {
+      "url": "https://git-scm.com/downloads"
+    },
+    "clean": true
   }
 }
 ```

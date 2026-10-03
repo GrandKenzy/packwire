@@ -164,7 +164,7 @@ def launch_gui(web_mode: bool = False, port: int = 5050) -> None:
 
 ---
 
-## 🔒 Constantes y Rutas de Configuración Exportadas
+## ⚙️ Constantes y Rutas de Configuración Exportadas
 
 ```python
 from packwire import (

@@ -43,7 +43,7 @@ Es el modo predeterminado de Packwire. Diseñado para herramientas portables (co
 
 ### 2. Modo `command` (Ejecución de Scripts de Consola)
 
-Diseñado para herramientas que cuentan con pipelines oficiales basados en consola o que requieren elevar privilegios en Windows (como Chocolatey, Rustup o MSYS2).
+Diseñado para herramientas que cuentan con pipelines oficiales basados en consola o que requieren elevar privilegios de administrador (como Chocolatey, Docker, Git, Rustup o paquetes de sistema).
 
 La configuración reside en la estructura `CommandConfig`:
 ```json
@@ -52,22 +52,27 @@ La configuración reside en la estructura `CommandConfig`:
     "mode": "command",
     "command": {
       "elevated": true,
-      "shell": "powershell",
-      "windows": "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))",
-      "binaries": ["choco.exe"]
+      "windows": "if (Get-Command winget -ErrorAction SilentlyContinue) { winget install -e --id Docker.DockerDesktop } elseif (Get-Command choco -ErrorAction SilentlyContinue) { choco install docker-desktop -y }",
+      "linux": "curl -fsSL https://get.docker.com -o /tmp/get-docker.sh && sudo sh /tmp/get-docker.sh && rm -f /tmp/get-docker.sh || (sudo apt-get update && sudo apt-get install -y docker.io)",
+      "darwin": "which brew >/dev/null 2>&1 && brew install --cask docker || open 'https://docs.docker.com/desktop/setup/install/mac-install/'",
+      "binaries": ["docker.exe", "docker"]
     }
   }
 }
 ```
 
-#### Manejo de Elevación de Privilegios (UAC)
+#### Manejo de Elevación de Privilegios Multiplataforma
 Si `command.elevated` es `True`:
-1. El instalador evalúa si el proceso actual ya cuenta con privilegios de Administrador mediante la API de Windows `ctypes.windll.shell32.IsUserAnAdmin()`.
-2. Si no es administrador, ejecuta PowerShell invocando el verbo `RunAs` para disparar el diálogo nativo de Control de Cuentas de Usuario (UAC):
+1. **En Windows:** Evalúa si el proceso ya es Administrador con `ctypes.windll.shell32.IsUserAnAdmin()`. Si no lo es, dispara el diálogo UAC nativo:
    ```powershell
    Start-Process powershell.exe -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -Command <script>" -Wait
    ```
-3. Si el usuario cancela la solicitud de elevación, el sistema captura el error Win32 `1223` (`ERROR_CANCELLED`) y aborta limpiamente informando que la operación fue revocada.
+   Si el usuario cancela la solicitud, captura el error Win32 `1223` (`ERROR_CANCELLED`) y aborta de forma controlada.
+2. **En macOS:** Invoca el cuadro de diálogo de autorización de seguridad del sistema mediante AppleScript:
+   ```bash
+   osascript -e 'do shell script "<script>" with administrator privileges'
+   ```
+3. **En Linux:** Detecta si la sesión ya es `root` (`os.geteuid() == 0`). En entornos gráficos de escritorio X11/Wayland con PolicyKit, lanza el diálogo visual mediante `pkexec /bin/bash -c "<script>"`; en terminales de consola, delega la autenticación a `sudo`.
 
 ### 3. Modo `site` (Redirección Web Asistida)
 

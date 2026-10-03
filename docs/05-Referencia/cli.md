@@ -29,20 +29,22 @@ packwire [-h] {install,remove,reinstall,update,list,available,info,path,ui,setup
 Instala un paquete en el sistema resolviendo dependencias y compilando sus shims correspondientes.
 
 ```bash
-packwire install <package> [--version <ver>] [--channel {stable,fixed}] [--mode {here,site}] [--force]
+packwire install <package> [--version <ver>] [--channel {stable,fixed}] [--mode {here,site,command}] [--force]
 ```
 
 | Argumento / Bandera | Tipo | Requerido | Descripción |
 | :--- | :--- | :--- | :--- |
-| `package` | Posicional | Sí | Nombre, alias o identificador semántico del paquete (ej. `python`, `python@stable`, `python@3.14`, `c`, `ffmpeg`, `chocolatey`). |
+| `package` | Posicional | Sí | Nombre, alias o identificador semántico del paquete (ej. `python`, `git`, `docker`, `c`, `ffmpeg`, `chocolatey`). |
 | `--version`, `-v` | Opción | No | Fuerza una versión exacta específica (ej. `-v 3.12.8`). |
 | `--channel` | Opción | No | Canal de distribución: `stable` (predeterminado) o `fixed`. |
-| `--mode`, `-m` | Opción | No | Modo de despliegue: `here` (automático desatendido) o `site` (sitio oficial). |
+| `--mode`, `-m` | Opción | No | Modo de despliegue: `here` (automático desatendido), `site` (sitio oficial) o `command` (script de consola con elevación). |
 | `--force`, `-f` | Bandera | No | Ignora colisiones preexistentes y fuerza la sobrescritura física de binarios y shims. |
 
 ```bash
 # Ejemplos:
 packwire install python
+packwire install git
+packwire install docker
 packwire install python@3.13 --mode here
 packwire install c --force
 ```
@@ -58,13 +60,14 @@ packwire remove [<package>] [--all] [--keep-path]
 
 | Argumento / Bandera | Tipo | Requerido | Descripción |
 | :--- | :--- | :--- | :--- |
-| `package` | Posicional | Condicional | Identificador del paquete a remover (ej. `python@stable`). Obligatorio salvo si se usa `--all`. |
+| `package` | Posicional | Condicional | Identificador del paquete a remover (ej. `python@stable`, `git`). Obligatorio salvo si se usa `--all`. |
 | `--all` | Bandera | No | Purga absoluta: remueve todas las aplicaciones, shims, registros de estado, caché y variable PATH. |
-| `--keep-path` | Bandera | No | Utilizada junto con `--all` para evitar eliminar la entrada de shims del registro `PATH`. |
+| `--keep-path` | Bandera | No | Utilizada junto con `--all` para evitar eliminar la entrada de shims del registro `PATH` o perfiles de shell. |
 
 ```bash
 # Ejemplos:
 packwire remove python@stable
+packwire remove git
 packwire remove --all
 ```
 
@@ -80,6 +83,7 @@ packwire reinstall <package>
 ```bash
 # Ejemplo:
 packwire reinstall c-gcc
+packwire reinstall git
 ```
 
 ---
@@ -99,6 +103,7 @@ packwire update [<package>]
 # Ejemplos:
 packwire update
 packwire update python@stable
+packwire update docker
 ```
 
 ---
@@ -115,13 +120,15 @@ packwire list
 ID                   NOMBRE       VERSIÓN    TIPO     MODO     RUTA
 --------------------------------------------------------------------------------
 python@stable        Python       3.14.0     stable   here     C:\...\apps\python@stable
+git                  Git          latest     stable   command  C:\Program Files\Git
+docker               Docker       latest     stable   command  C:\Program Files\Docker
 c-gcc                C/C++ (GCC)  1.23.0     fixed    here     C:\...\apps\c-gcc
 ```
 
 ---
 
 ### 6. `available`
-Imprime la lista de todos los manifiestos disponibles en el catálogo interno de Packwire.
+Imprime la lista de todos los manifiestos disponibles en el catálogo interno de Packwire (incluyendo Python, Node.js, Git, Docker, GCC, FFmpeg, SDL3, entre otros).
 
 ```bash
 packwire available
@@ -138,13 +145,15 @@ packwire info <package>
 
 ```bash
 # Ejemplo:
+packwire info docker
+packwire info git
 packwire info ffmpeg
 ```
 
 ---
 
 ### 8. `path`
-Verifica o configura el directorio de shims dentro de la variable de entorno `PATH` del usuario.
+Verifica o configura el directorio de shims dentro de la variable de entorno `PATH` del usuario actual.
 
 ```bash
 packwire path [--add]
@@ -152,8 +161,8 @@ packwire path [--add]
 
 | Bandera | Descripción |
 | :--- | :--- |
-| *(sin banderas)* | Muestra la ruta física del directorio de shims y comprueba si ya está presente en el `PATH`. |
-| `--add` | Inyecta la ruta en `HKCU\Environment\Path` y difunde el evento de sistema `WM_SETTINGCHANGE`. |
+| *(sin banderas)* | Muestra la ruta física del directorio de shims y comprueba si ya está presente en la sesión activa o en el perfil persistente del usuario. |
+| `--add` | Inyecta la ruta de shims: en Windows actualiza `HKCU\Environment\Path` y emite `WM_SETTINGCHANGE`; en Linux y macOS anexa la directiva `export PATH` en `~/.zshrc`, `~/.bashrc` y `~/.profile`. |
 
 ---
 
@@ -172,7 +181,7 @@ packwire ui [--web] [--port <puerto>]
 ---
 
 ### 10. `setup` (Alias: `self-install`)
-Instala e integra Packwire en el sistema operativo Windows (shims maestros, `PATH` y accesos directos).
+Instala e integra Packwire en el sistema operativo anfitrión (shims maestros, `PATH` y accesos directos).
 
 ```bash
 packwire setup [--desktop] [--no-start-menu] [--no-path]
@@ -180,9 +189,9 @@ packwire setup [--desktop] [--no-start-menu] [--no-path]
 
 | Bandera | Descripción |
 | :--- | :--- |
-| `--desktop` | Genera un acceso directo de la interfaz gráfica en el Escritorio del usuario actual. |
-| `--no-start-menu` | Omite la creación del icono en el Menú Inicio de Windows. |
-| `--no-path` | Omite la inyección del directorio de shims en la variable `PATH`. |
+| `--desktop` | Genera un acceso directo de la interfaz gráfica en el Escritorio del usuario (`.lnk` en Windows, `.desktop` en Linux, `.command` en macOS). |
+| `--no-start-menu` | Omite la creación del icono en el Menú Inicio (Windows) o en `~/.local/share/applications/` (Linux). |
+| `--no-path` | Omite la inyección del directorio de shims en la variable de entorno `PATH` del sistema. |
 
 ---
 
