@@ -1,0 +1,25 @@
+{
+  "$schema": "packwire-v1",
+  "id": "python@stable",
+  "name": "Python",
+  "icon": "🐍",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Latest stable release of Python Programming Language",
+  "upstream": {
+    "source": "python_org_api",
+    "endpoint": "https://www.python.org/api/v2/downloads/release/?is_published=true"
+  },
+  "install": {
+    "mode": "here",
+    "here": {
+      "format": "zip",
+      "binaries": ["python.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://www.python.org/downloads/"
+    },
+    "clean": true
+  }
+}

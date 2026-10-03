@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "python@3.14",
+  "name": "Python",
+  "icon": "🐍",
+  "type": "fixed",
+  "version": "3.14.8",
+  "category": "programming languages",
+  "description": "Python Programming Language v3.14",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://www.python.org/ftp/python/3.14.8/python-3.14.8-embed-amd64.zip",
+      "format": "zip",
+      "binaries": ["python.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://www.python.org/downloads/release/python-3148/"
+    },
+    "clean": true
+  }
+}

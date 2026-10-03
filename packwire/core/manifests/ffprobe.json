@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "ffprobe",
+  "name": "FFprobe",
+  "aliases": ["ffprobe"],
+  "icon": "🔍",
+  "type": "stable",
+  "version": "7.1",
+  "category": "multimedia",
+  "description": "Herramienta oficial de análisis multimedia y extracción de metadatos de audio y video.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
+      "format": "zip",
+      "binaries": ["ffprobe.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://ffmpeg.org/ffprobe.html"
+    },
+    "clean": true
+  }
+}

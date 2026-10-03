@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "python@3.13",
+  "name": "Python",
+  "icon": "🐍",
+  "type": "fixed",
+  "version": "3.13.2",
+  "category": "programming languages",
+  "description": "Python Programming Language v3.13",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://www.python.org/ftp/python/3.13.2/python-3.13.2-embed-amd64.zip",
+      "format": "zip",
+      "binaries": ["python.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://www.python.org/downloads/release/python-3132/"
+    },
+    "clean": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "rust",
+  "name": "Rust",
+  "aliases": ["rust", "rustc", "cargo", "rustup"],
+  "icon": "🦀",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje de programación de sistemas seguro y concurrente con gestor Cargo y compilador rustc.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "Invoke-WebRequest -Uri https://win.rustup.rs/x86_64 -OutFile (Join-Path $env:TEMP 'rustup-init.exe'); & (Join-Path $env:TEMP 'rustup-init.exe') -y --no-modify-path; Remove-Item (Join-Path $env:TEMP 'rustup-init.exe') -ErrorAction SilentlyContinue",
+      "linux": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y",
+      "darwin": "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y",
+      "binaries": ["rustc.exe", "cargo.exe", "rustup.exe"]
+    },
+    "site": {
+      "url": "https://www.rust-lang.org/tools/install"
+    },
+    "clean": true
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "packwire-v1",
+  "id": "nodejs@stable",
+  "name": "Node.js",
+  "aliases": ["node", "nodejs", "npm", "npx"],
+  "icon": "🟢",
+  "type": "stable",
+  "category": "runtimes",
+  "description": "Entorno de ejecución de JavaScript (V8) del lado del servidor con npm y npx incluidos.",
+  "upstream": {
+    "source": "nodejs_org_api",
+    "endpoint": "https://nodejs.org/dist/index.json"
+  },
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-win-x64.zip",
+      "format": "zip",
+      "binaries": ["node.exe", "npm.cmd", "npx.cmd"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://nodejs.org/en/download"
+    },
+    "clean": true
+  }
+}

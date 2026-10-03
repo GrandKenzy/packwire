@@ -1,0 +1,60 @@
+/* ==========================================================================
+   DARK CARDS COLORING
+   Only applies colors, shadows and borders.
+   Layout (grid, flex, dimensions) is handled permanently by structure.css.
+   ========================================================================== */
+
+.package-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.package-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.1);
+}
+
+.pkg-icon-container {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border);
+}
+
+.pkg-name {
+  color: var(--text-primary);
+}
+
+.pkg-version {
+  color: var(--text-secondary);
+}
+
+.pkg-desc {
+  color: var(--text-secondary);
+}
+
+.installed-item {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.installed-item:hover {
+  border-color: var(--border-hover);
+}
+
+.shim-tag {
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border);
+  color: #38bdf8;
+}
+
+.info-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.info-value.code {
+  background-color: var(--surface-subtle);
+  border-color: var(--border-light);
+  color: #7dd3fc;
+}

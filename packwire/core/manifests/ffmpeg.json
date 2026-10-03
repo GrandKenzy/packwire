@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "ffmpeg@stable",
+  "name": "FFmpeg",
+  "aliases": ["ffmpeg", "ffprobe", "ffplay"],
+  "icon": "🎬",
+  "type": "stable",
+  "version": "7.1",
+  "category": "multimedia",
+  "description": "Suite multimedia líder para procesar, transcodificar, cortar y reproducir video y audio en terminal.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
+      "format": "zip",
+      "binaries": ["ffmpeg.exe", "ffprobe.exe", "ffplay.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://ffmpeg.org/download.html"
+    },
+    "clean": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "pacman",
+  "name": "Pacman",
+  "aliases": ["pacman"],
+  "icon": "🟡",
+  "type": "stable",
+  "category": "package managers",
+  "description": "Gestor de paquetes ágil y ligero de Arch Linux adaptado para Windows vía MSYS2.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://github.com/msys2/msys2-installer/releases/download/2024-05-07/msys2-base-x86_64-20240507.tar.xz",
+      "format": "tar",
+      "binaries": ["pacman.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://wiki.archlinux.org/title/Pacman"
+    },
+    "clean": true
+  }
+}

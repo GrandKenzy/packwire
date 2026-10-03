@@ -1,0 +1,22 @@
+{
+  "$schema": "packwire-v1",
+  "id": "chocolatey",
+  "name": "Chocolatey",
+  "aliases": ["choco", "chocolatey"],
+  "icon": "🍫",
+  "type": "stable",
+  "category": "package managers",
+  "description": "Gestor de paquetes clásico para Windows con el mayor catálogo de software comunitario.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "elevated": true,
+      "windows": "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))",
+      "binaries": ["choco.exe"]
+    },
+    "site": {
+      "url": "https://chocolatey.org/"
+    },
+    "clean": true
+  }
+}

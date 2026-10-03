@@ -1,0 +1,49 @@
+:root {
+  /* Dark Elegant Theme Palette */
+  --bg-color: #0b0f17;
+  --surface: #121824;
+  --surface-hover: #1a2232;
+  --surface-subtle: #161e2e;
+
+  --border: #1f293d;
+  --border-light: #26334a;
+  --border-hover: #334460;
+  --border-focus: #38bdf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --btn-primary-bg: #38bdf8;
+  --btn-primary-text: #0b0f17;
+  --btn-primary-hover: #7dd3fc;
+
+  --accent-emerald: #10b981;
+  --accent-emerald-bg: rgba(16, 185, 129, 0.12);
+  --accent-emerald-border: rgba(16, 185, 129, 0.25);
+  --accent-emerald-text: #34d399;
+
+  --accent-slate-bg: rgba(148, 163, 184, 0.1);
+  --accent-slate-border: rgba(148, 163, 184, 0.2);
+  --accent-slate-text: #cbd5e1;
+
+  --accent-amber: #f59e0b;
+  --accent-amber-bg: rgba(245, 158, 11, 0.12);
+  --accent-amber-border: rgba(245, 158, 11, 0.25);
+  --accent-amber-text: #fbbf24;
+
+  --accent-red: #ef4444;
+  --accent-red-bg: rgba(239, 68, 68, 0.12);
+  --accent-red-border: rgba(239, 68, 68, 0.25);
+  --accent-red-text: #f87171;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+}

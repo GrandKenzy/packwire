@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "vscode",
+  "name": "Visual Studio Code",
+  "aliases": ["code", "visual-studio-code", "vs-code"],
+  "icon": "💻",
+  "type": "stable",
+  "version": "latest",
+  "category": "editors",
+  "description": "Editor de código ligero y extensible de Microsoft con soporte para extensiones, Git y depuración.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://code.visualstudio.com/Download"
+    },
+    "clean": true
+  }
+}

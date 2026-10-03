@@ -1,0 +1,40 @@
+{
+  "$schema": "packwire-v1",
+  "id": "php@stable",
+  "name": "PHP",
+  "aliases": ["php"],
+  "icon": "🐘",
+  "type": "stable",
+  "version": "8.5.11",
+  "category": "programming languages",
+  "description": "Lenguaje de programación web y CLI popular para desarrollo backend en Windows, Linux y macOS.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://downloads.php.net/~windows/releases/archives/php-8.5.11-nts-Win32-vs17-x64.zip",
+      "format": "zip",
+      "binaries": ["php.exe"],
+      "addpath": true
+    },
+    "os": {
+      "linux": {
+        "mode": "command",
+        "command": {
+          "linux": "sudo apt-get update && sudo apt-get install -y php-cli || sudo dnf install -y php-cli || sudo pacman -S --noconfirm php",
+          "binaries": ["php"]
+        }
+      },
+      "darwin": {
+        "mode": "command",
+        "command": {
+          "darwin": "brew install php",
+          "binaries": ["php"]
+        }
+      }
+    },
+    "site": {
+      "url": "https://windows.php.net/download/"
+    },
+    "clean": true
+  }
+}

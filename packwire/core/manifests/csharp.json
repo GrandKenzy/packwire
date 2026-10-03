@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "csharp",
+  "name": "C# (.NET SDK)",
+  "aliases": ["c#", "csharp", "dotnet", "dotnet-sdk"],
+  "icon": "🟣",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "SDK oficial de Microsoft .NET para compilar y ejecutar C#, F# y aplicaciones modernas.",
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "& { [scriptblock]::Create((Invoke-WebRequest -UseBasicParsing 'https://dot.net/v1/dotnet-install.ps1')) } -Channel LTS",
+      "linux": "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Channel LTS",
+      "darwin": "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin -Channel LTS",
+      "binaries": ["dotnet.exe"]
+    },
+    "site": {
+      "url": "https://dotnet.microsoft.com/download"
+    },
+    "clean": true
+  }
+}

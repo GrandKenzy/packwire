@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Packwire - Gestor de Paquetes</title>
+  <link rel="stylesheet" href="global/structure.css">
+  <link rel="stylesheet" id="theme-style-background" href="global/default_background.css">
+  <link rel="stylesheet" id="theme-style-cards" href="global/default_cards.css">
+  <link rel="stylesheet" id="theme-style-buttons" href="global/default_buttons.css">
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem("packwire_theme");
+        if (t && t !== "default") {
+          var bg = document.getElementById("theme-style-background");
+          var cd = document.getElementById("theme-style-cards");
+          var bt = document.getElementById("theme-style-buttons");
+          if (bg) bg.href = "global/" + t + "_background.css";
+          if (cd) cd.href = "global/" + t + "_cards.css";
+          if (bt) bt.href = "global/" + t + "_buttons.css";
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="logo.png" alt="Packwire Logo" class="brand-logo-img">
+        </div>
+        <div class="brand-info">
+          <h1>Packwire</h1>
+          <span class="version-tag">v0.1.0</span>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <select class="theme-select" id="theme-selector" title="Seleccionar Tema">
+          <option value="default">Claro (Default)</option>
+          <option value="dark">Oscuro (Dark)</option>
+        </select>
+
+        <div class="badge platform-badge" id="platform-badge">
+          <span class="badge-dot"></span>
+          <span id="platform-text">Detectando SO...</span>
+        </div>
+        
+        <div class="path-status" id="path-status-container">
+          <span class="path-indicator" id="path-indicator"></span>
+          <span id="path-text">Comprobando PATH...</span>
+          <button class="btn btn-sm btn-outline" id="btn-fix-path" style="display: none;">
+            Añadir a PATH
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="app-nav">
+      <button class="nav-tab active" data-tab="catalog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        Catálogo de Paquetes
+      </button>
+      <button class="nav-tab" data-tab="installed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Paquetes Instalados 
+        <span class="counter-badge" id="installed-counter">0</span>
+      </button>
+      <button class="nav-tab" data-tab="system">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Sistema y Rutas
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+      <!-- TAB 1: CATALOG -->
+      <section class="tab-pane active" id="tab-catalog">
+        <div class="pane-header">
+          <div>
+            <h2>Catálogo de Paquetes</h2>
+            <p class="subtitle">Descarga versiones fijas o la última versión estable sin complicaciones.</p>
+          </div>
+          <div class="pane-controls">
+            <div class="search-box">
+              <span class="search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="catalog-search" class="search-input" placeholder="Buscar paquete (ej. gcc, ffmpeg, node)... [/]" autocomplete="off" spellcheck="false">
+              <button id="btn-clear-catalog-search" class="btn-clear-search" style="display: none;" title="Limpiar búsqueda">&times;</button>
+            </div>
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="all">Todos</button>
+              <button class="filter-btn" data-filter="stable">Stable</button>
+              <button class="filter-btn" data-filter="fixed">Fixed</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-results-info" id="catalog-search-info" style="display: none;"></div>
+
+        <div class="cards-grid" id="catalog-cards">
+          <!-- Dynamically populated via app.js -->
+          <div class="skeleton-card">Cargando paquetes...</div>
+        </div>
+      </section>
+
+      <!-- TAB 2: INSTALLED -->
+      <section class="tab-pane" id="tab-installed">
+        <div class="pane-header">
+          <div>
+            <h2>Paquetes Instalados</h2>
+            <p class="subtitle">Gestiona tus paquetes activos, shims vinculados y desinstalación limpia.</p>
+          </div>
+          <div class="pane-controls">
+            <div class="search-box">
+              <span class="search-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input type="text" id="installed-search" class="search-input" placeholder="Filtrar instalados..." autocomplete="off" spellcheck="false">
+              <button id="btn-clear-installed-search" class="btn-clear-search" style="display: none;" title="Limpiar búsqueda">&times;</button>
+            </div>
+            <button class="btn btn-outline" id="btn-refresh-installed">
+              <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+              Actualizar Lista
+            </button>
+          </div>
+        </div>
+
+        <div class="search-results-info" id="installed-search-info" style="display: none;"></div>
+
+        <div class="installed-list" id="installed-container">
+          <!-- Dynamically populated via app.js -->
+        </div>
+      </section>
+
+      <!-- TAB 3: SYSTEM -->
+      <section class="tab-pane" id="tab-system">
+        <div class="pane-header">
+          <div>
+            <h2>Información del Sistema y Rutas</h2>
+            <p class="subtitle">Ubicaciones estándar utilizadas por Packwire en este entorno.</p>
+          </div>
+          <div class="pane-controls">
+            <button class="btn btn-danger" id="btn-uninstall-all" title="Desinstalar todos los paquetes, shims y datos de Packwire">
+              <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Desinstalar Todo
+            </button>
+          </div>
+        </div>
+
+        <div class="system-grid">
+          <div class="info-card">
+            <span class="info-label">Sistema Operativo</span>
+            <span class="info-value" id="sys-os">-</span>
+          </div>
+          <div class="info-card">
+            <span class="info-label">Arquitectura</span>
+            <span class="info-value" id="sys-arch">-</span>
+          </div>
+          <div class="info-card full-width">
+            <span class="info-label">Directorio Raíz de Packwire</span>
+            <span class="info-value code" id="sys-root">-</span>
+          </div>
+          <div class="info-card full-width">
+            <span class="info-label">Carpeta de Shims (PATH)</span>
+            <span class="info-value code" id="sys-shims">-</span>
+          </div>
+          <div class="info-card full-width">
+            <span class="info-label">Carpeta de Aplicaciones</span>
+            <span class="info-value code" id="sys-apps">-</span>
+          </div>
+          <div class="info-card full-width danger-card">
+            <div class="danger-card-content">
+              <div>
+                <span class="info-label danger-label">Zona de Desinstalación Total</span>
+                <p class="subtitle" style="margin-top: 3px;">Elimina todos los paquetes descargados, limpia la carpeta de shims, borra la caché y retira Packwire de la variable PATH del sistema.</p>
+              </div>
+              <button class="btn btn-danger btn-sm" id="btn-uninstall-all-card">
+                <svg class="btn-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Desinstalar Todo Packwire
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal for Installation Progress -->
+    <div class="modal-overlay" id="action-modal" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-title">Instalando Paquete</h3>
+          <button class="btn-close" id="btn-modal-close" style="display: none;">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="modal-desc">Iniciando proceso...</p>
+          
+          <div class="progress-track" id="modal-progress-track">
+            <div class="progress-bar-animated" id="modal-progress-bar"></div>
+          </div>
+
+          <div class="modal-details" id="modal-details">
+            <span id="modal-status-text">Por favor espera...</span>
+          </div>
+
+          <div class="modal-terminal-box" id="modal-terminal-box">
+            <div class="modal-terminal-header">
+              <span>Terminal de Instalación</span>
+              <span class="live-pill" id="terminal-live-pill">EN VIVO</span>
+            </div>
+            <pre class="modal-terminal-logs" id="modal-terminal-logs">Iniciando cola de instalación...</pre>
+          </div>
+        </div>
+        <div class="modal-footer" id="modal-footer" style="display: none;">
+          <button class="btn btn-outline" id="btn-modal-cancel" style="display: none;">Cancelar</button>
+          <button class="btn btn-danger" id="btn-modal-confirm" style="display: none;">Confirmar Desinstalación</button>
+          <button class="btn btn-primary" id="btn-modal-done">Aceptar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "c-gcc",
+  "name": "C/C++ (GCC)",
+  "aliases": ["c", "gcc", "g++", "w64devkit"],
+  "icon": "⚙️",
+  "type": "fixed",
+  "version": "1.23.0",
+  "category": "compilers",
+  "description": "Entorno completo y portátil de C/C++ para Windows con GCC 14, G++, GDB y GNU Make vía w64devkit.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://github.com/skeeto/w64devkit/releases/download/v1.23.0/w64devkit-1.23.0.zip",
+      "format": "zip",
+      "binaries": ["gcc.exe", "g++.exe", "gdb.exe", "make.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://github.com/skeeto/w64devkit"
+    },
+    "clean": true
+  }
+}

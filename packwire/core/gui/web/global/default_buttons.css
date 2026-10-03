@@ -1,0 +1,69 @@
+/* ==========================================================================
+   DEFAULT BUTTONS & CONTROLS COLORING
+   Only applies colors and backgrounds.
+   Layout (flex, padding, radius) is handled permanently by structure.css.
+   ========================================================================== */
+
+.filter-group {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.filter-btn {
+  color: var(--text-secondary);
+}
+
+.filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-color: var(--btn-primary-bg);
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+}
+
+.btn-outline {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+.btn-danger {
+  background-color: var(--accent-red-bg);
+  color: var(--accent-red-text);
+  border-color: var(--accent-red-border);
+}
+
+.btn-danger:hover {
+  background-color: var(--accent-red-text);
+  color: white;
+}
+
+.modal-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+}

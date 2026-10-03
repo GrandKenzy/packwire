@@ -1,0 +1,73 @@
+/* ==========================================================================
+   DARK BUTTONS & CONTROLS COLORING
+   Only applies colors and backgrounds.
+   Layout (flex, padding, radius) is handled permanently by structure.css.
+   ========================================================================== */
+
+.filter-group {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+
+.filter-btn {
+  color: var(--text-secondary);
+}
+
+.filter-btn:hover {
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.btn-primary {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-color: var(--btn-primary-bg);
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
+}
+
+.btn-outline {
+  background-color: var(--surface-subtle);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.modal-card {
+  background-color: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.progress-track {
+  background-color: var(--surface-subtle);
+  border-color: var(--border);
+}
+
+.progress-bar-animated {
+  background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
+  background-size: 200% 100%;
+}
+
+.toast {
+  background-color: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+}

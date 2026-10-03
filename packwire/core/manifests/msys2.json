@@ -1,0 +1,23 @@
+{
+  "$schema": "packwire-v1",
+  "id": "msys2",
+  "name": "MSYS2",
+  "aliases": ["msys2", "msys"],
+  "icon": "🧰",
+  "type": "stable",
+  "category": "development tools",
+  "description": "Entorno tipo Unix nativo para Windows con GCC, herramientas POSIX y gestor Pacman.",
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://github.com/msys2/msys2-installer/releases/download/2024-05-07/msys2-base-x86_64-20240507.tar.xz",
+      "format": "tar",
+      "binaries": ["pacman.exe", "bash.exe", "mintty.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://www.msys2.org/"
+    },
+    "clean": true
+  }
+}

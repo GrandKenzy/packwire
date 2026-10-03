@@ -1,0 +1,5 @@
+/* Packwire Global Stylesheet Entrypoint */
+@import "global/structure.css";
+@import "global/default_background.css";
+@import "global/default_cards.css";
+@import "global/default_buttons.css";
