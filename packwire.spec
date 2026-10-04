@@ -19,7 +19,6 @@ icon_file = str(icon_path) if (icon_path.exists() and sys.platform == "win32") e
 
 hiddenimports = [
     'bottle',
-    'pywebview',
     'webview',
     'ctypes',
     'json',

@@ -24,22 +24,29 @@ def launch_gui(web_mode: bool = False, port: int = 5050):
         except ImportError:
             has_webview = False
 
+    gui_opened = False
     if has_webview and not web_mode:
-        import webview
-        print(f"[*] Iniciando ventana de escritorio nativa (Edge/WebKit)...")
-        window = webview.create_window(
-            title="Packwire",
-            url=url,
-            js_api=bridge,
-            width=1340,
-            height=840,
-            min_size=(1040, 680)
-        )
-        webview.start()
-        print("[*] Ventana cerrada.")
-    else:
+        try:
+            import webview
+            print("[*] Iniciando ventana de escritorio nativa (Edge/WebKit)...")
+            window = webview.create_window(
+                title="Packwire",
+                url=url,
+                js_api=bridge,
+                width=1340,
+                height=840,
+                min_size=(1040, 680)
+            )
+            webview.start()
+            print("[*] Ventana cerrada.")
+            gui_opened = True
+        except Exception as e:
+            print(f"[!] No se pudo inicializar la ventana nativa ({e}). Abriendo en navegador web...")
+            gui_opened = False
+
+    if not gui_opened:
         print(f"[*] Servidor local activo en: {url}")
-        print(f"[*] Abriendo interfaz en tu navegador predeterminado...")
+        print("[*] Abriendo interfaz en tu navegador predeterminado...")
         webbrowser.open(url)
         print("[*] Presiona Ctrl+C en esta terminal para detener el servidor.")
         try:

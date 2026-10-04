@@ -4,6 +4,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Optional
 import sys
+import threading
 
 from packwire.core.gui.bridge import GuiBridge
 
