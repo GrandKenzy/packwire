@@ -45,7 +45,7 @@ jobs:
       - name: Empaquetar ZIP Portable de Windows
         shell: pwsh
         run: |
-          Compress-Archive -Path dist\packwire.exe -DestinationPath dist\packwire-windows-x64.zip -Force
+          Compress-Archive -Path dist\packwire.exe, dist\packwirew.exe -DestinationPath dist\packwire-windows-x64.zip -Force
 
       - name: Instalar Inno Setup
         shell: pwsh
@@ -77,6 +77,7 @@ jobs:
             dist/Packwire-Setup*.exe
             dist/packwire-windows-x64.zip
             dist/packwire.exe
+            dist/packwirew.exe
           retention-days: 1
 
   # -------------------------------------------------------------

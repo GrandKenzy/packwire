@@ -83,8 +83,13 @@ def install_self(
         cmd_content = f'@echo off\r\n"{str(exe_path)}" %*\r\n'
         ps1_content = f'& "{str(exe_path)}" $args\r\n'
         target_executable = exe_path
-        gui_target = exe_path
-        gui_args = "ui"
+        packwirew_exe = exe_path.parent / "packwirew.exe"
+        if packwirew_exe.exists():
+            gui_target = packwirew_exe
+            gui_args = ""
+        else:
+            gui_target = exe_path
+            gui_args = "ui"
     else:
         python_exe = Path(sys.executable).resolve()
         pythonw_exe = python_exe.parent / "pythonw.exe"

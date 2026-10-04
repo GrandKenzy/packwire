@@ -7,8 +7,9 @@
 #define MyAppName "Packwire"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Packwire Team"
-#define MyAppURL "https://github.com/packwire/packwire"
+#define MyAppURL "https://github.com/GrandKenzy/packwire"
 #define MyAppExeName "packwire.exe"
+#define MyAppGuiExeName "packwirew.exe"
 
 [Setup]
 AppId={{E58C3729-28BC-4375-9C4B-0BE9FD162121}
@@ -42,18 +43,19 @@ Name: "addtopath"; Description: "Añadir Packwire a la variable de entorno PATH 
 
 [Files]
 Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\{#MyAppGuiExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "packwire\core\gui\web\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "ui"; IconFilename: "{app}\logo.ico"; Comment: "Packwire Package Manager"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; Parameters: ""; IconFilename: "{app}\logo.ico"; Comment: "Packwire Package Manager"
 Name: "{group}\Packwire CLI (Consola)"; Filename: "{cmd}"; Parameters: "/k ""{app}\{#MyAppExeName}"" --help"; IconFilename: "{app}\logo.ico"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "ui"; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; Parameters: ""; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Parameters: "setup --no-start-menu"; StatusMsg: "Configurando shims y entorno de Packwire..."; Flags: runhidden
-Filename: "{app}\{#MyAppExeName}"; Parameters: "ui"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppGuiExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: "{app}\{#MyAppExeName}"; Parameters: "uninstall --all"; RunOnceId: "PackwireCleanAll"; Flags: runhidden

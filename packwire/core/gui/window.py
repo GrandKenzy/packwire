@@ -7,12 +7,31 @@ from packwire.core.gui.bridge import GuiBridge
 from packwire.core.gui.server import run_local_server
 
 
+def _hide_console_window():
+    """Hide the background console window on Windows if spawned exclusively for this process."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            user32 = ctypes.windll.user32
+            hwnd = kernel32.GetConsoleWindow()
+            if hwnd:
+                pids = (ctypes.c_uint * 2)()
+                count = kernel32.GetConsoleProcessList(pids, 2)
+                # If only 1 process is attached, console was created for this GUI window
+                if count <= 1:
+                    user32.ShowWindow(hwnd, 0)  # SW_HIDE
+        except Exception:
+            pass
+
+
 def launch_gui(web_mode: bool = False, port: int = 5050):
     """
     Launch the Packwire User Interface.
     - If web_mode=False and pywebview is installed: Opens native desktop window.
     - If web_mode=True or pywebview is missing: Starts local server and opens browser.
     """
+    _hide_console_window()
     bridge = GuiBridge()
     server, url = run_local_server(port=port)
 

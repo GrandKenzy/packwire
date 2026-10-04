@@ -89,7 +89,17 @@ def main(args: List[str] = None):
     build_parser.add_argument("--wheel", action="store_true", help="Construye paquete de distribución wheel")
     build_parser.add_argument("--all", action="store_true", help="Construye tanto el ejecutable como el wheel")
 
-    parsed = parser.parse_args(args)
+    if args is None:
+        raw_args = sys.argv[1:]
+    else:
+        raw_args = args
+
+    if not raw_args:
+        exe_lower = sys.executable.lower()
+        if "packwirew" in exe_lower or "pythonw" in exe_lower:
+            raw_args = ["ui"]
+
+    parsed = parser.parse_args(raw_args)
 
     if not parsed.command:
         parser.print_help()
