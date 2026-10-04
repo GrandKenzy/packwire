@@ -128,23 +128,27 @@ Si prefieres gestionar la instalación manualmente o dentro de un entorno virtua
 
 ### Método 4: Asistente Gráfico de Windows (`Packwire-Setup.exe` Inno Setup)
 
-Para distribuir Packwire a usuarios finales o en entornos corporativos donde no se dispone de Python preinstalado:
+Para usuarios finales o entornos corporativos donde no se dispone de Python preinstalado:
 
-1. **Compilar el ejecutable independiente:**
-   ```bash
-   packwire build --exe
-   ```
-2. **Compilar el asistente de instalación:**
-   Compila el archivo [`installer.iss`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/installer.iss) usando el compilador Inno Setup (`iscc`):
-   ```cmd
-   iscc installer.iss
-   ```
-3. **Instalar:**
-   Ejecuta el archivo generado `dist/Packwire-Setup.exe`.
+#### Opción A: Descargar el Binario Oficial Precompilado
+1. Ve a la sección de **Releases** en GitHub: `https://github.com/GrandKenzy/packwire/releases`.
+2. Descarga el instalador más reciente: `Packwire-Setup.exe` (o `Packwire-Setup-vX.Y.Z.exe`).
+3. Ejecuta el archivo descargado y sigue las instrucciones del asistente en pantalla:
    * El asistente permite seleccionar idioma (Español o Inglés).
    * Se instala en `{localappdata}\Programs\Packwire` sin requerir derechos de administrador.
    * Ofrece casillas de verificación para crear el icono en el Escritorio y registrar el binario en el `PATH` del usuario.
    * Registra automáticamente la entrada de desinstalación en *Configuración > Aplicaciones instaladas*.
+
+#### Opción B: Compilarlo tú mismo desde el código fuente
+1. Compila el ejecutable independiente:
+   ```bash
+   packwire build --exe
+   ```
+2. Compila el instalador con Inno Setup (`iscc`):
+   ```cmd
+   iscc installer.iss
+   ```
+3. Ejecuta el archivo generado en `dist/Packwire-Setup.exe`.
 
 ---
 

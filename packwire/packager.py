@@ -76,7 +76,8 @@ def build_exe(clean: bool = True) -> bool:
     if clean:
         if build_dir.exists():
             shutil.rmtree(build_dir, ignore_errors=True)
-        dist_exe = dist_dir / "packwire.exe"
+        exe_name = "packwire.exe" if sys.platform == "win32" else "packwire"
+        dist_exe = dist_dir / exe_name
         if dist_exe.exists():
             try:
                 dist_exe.unlink()
@@ -90,7 +91,8 @@ def build_exe(clean: bool = True) -> bool:
 
     try:
         subprocess.run(cmd, cwd=str(ROOT_DIR), check=True)
-        exe_path = dist_dir / "packwire.exe"
+        exe_name = "packwire.exe" if sys.platform == "win32" else "packwire"
+        exe_path = dist_dir / exe_name
         if exe_path.exists():
             size_mb = exe_path.stat().st_size / (1024 * 1024)
             print(f"\n========================================================")
@@ -100,7 +102,7 @@ def build_exe(clean: bool = True) -> bool:
             print(f"========================================================\n")
             return True
         else:
-            print("[-] El proceso de PyInstaller terminó pero no se encontró packwire.exe.")
+            print(f"[-] El proceso de PyInstaller terminó pero no se encontró {exe_name}.")
             return False
     except subprocess.CalledProcessError as e:
         print(f"[-] Falló la compilación de PyInstaller (código {e.returncode}).")

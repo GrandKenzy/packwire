@@ -15,17 +15,13 @@ datas = [
 ]
 
 icon_path = project_dir / 'packwire' / 'core' / 'gui' / 'web' / 'logo.ico'
-icon_file = str(icon_path) if icon_path.exists() else None
+icon_file = str(icon_path) if (icon_path.exists() and sys.platform == "win32") else None
 
 hiddenimports = [
     'bottle',
     'pywebview',
     'webview',
-    'webview.platforms.winforms',
-    'webview.platforms.edgechromium',
     'ctypes',
-    'ctypes.wintypes',
-    'winreg',
     'json',
     'urllib.request',
     'urllib.error',
@@ -36,6 +32,22 @@ hiddenimports = [
     'subprocess',
     'http.server',
 ]
+
+if sys.platform == "win32":
+    hiddenimports.extend([
+        'webview.platforms.winforms',
+        'webview.platforms.edgechromium',
+        'ctypes.wintypes',
+        'winreg',
+    ])
+elif sys.platform == "darwin":
+    hiddenimports.extend([
+        'webview.platforms.cocoa',
+    ])
+else:
+    hiddenimports.extend([
+        'webview.platforms.gtk',
+    ])
 
 a = Analysis(
     ['packwire/__main__.py'],
