@@ -1,205 +1,193 @@
 # Guía Completa de Instalación
 
-Packwire es compatible de forma nativa con **Windows (10/11)**, **Linux** y **macOS**. Esta guía describe de forma exhaustiva todos los métodos de instalación disponibles, desde instaladores automáticos de un solo clic hasta paquetes independientes para entornos sin Python preinstalado.
+Packwire es compatible de forma nativa con **Windows (10/11)**, **Linux** y **macOS**. Esta guía describe de forma exhaustiva todos los métodos de instalación disponibles, priorizando la instalación mediante **binarios precompilados oficiales** para evitar la necesidad de instalar Python o manipular código fuente.
 
 ---
 
-## 📋 Requisitos del Sistema
-
-Antes de comenzar, asegúrate de que tu equipo cumple con los siguientes requisitos mínimos:
-
-| Plataforma | Requisito Mínimo | Motor Gráfico (GUI) | Permisos Requeridos |
-| :--- | :--- | :--- | :--- |
-| **Windows** | Windows 10 (1809+) o Windows 11 | Microsoft Edge WebView2 (integrado) | Usuario estándar (`HKCU`) |
-| **Linux** | Kernel 4.15+, glibc 2.27+ | WebKitGTK (`libwebkit2gtk-4.0` o `4.1`) | Usuario estándar (`~/.local/share`) |
-| **macOS** | macOS 11.0 (Big Sur) o superior | Safari WebKit (nativo) | Usuario estándar (`~/.local/share`) |
-
-> [!NOTE]
-> **Permisos de Administrador no requeridos:** Packwire se instala y opera íntegramente en el espacio del usuario actual (`%APPDATA%` en Windows y `~/.local/share` en Linux/macOS). No requiere privilegios de Administrador ni `root` para su funcionamiento cotidiano, a menos que se instalen paquetes del sistema mediante el modo `command` (ej. Chocolatey o Docker oficial).
-
----
-
-## 🚀 Métodos de Instalación
-
-Selecciona el método más adecuado para tu entorno de trabajo:
+## ⚡ Resumen Rápido: ¿Qué método elegir?
 
 ```
-                              ¿Tienes Python 3.9+ instalado?
-                                    /               \
-                                 SÍ                  NO
-                                /                      \
-          ¿Qué sistema utilizas?               [Windows Standalone / Inno Setup]
-          /                    \                    Packwire-Setup.exe o packwire.exe
-    [Windows]              [Linux / macOS]
-   install.bat                install.sh
-  o install.ps1              (POSIX bash)
+┌────────────────────────────────────────────────────────────────────────┐
+│  ¿Quieres usar Packwire directamente sin instalar Python ni clonar?   │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ SÍ (Recomendado)
+                                    ▼
+       👉 MÉTODO 1: Descargar Binarios Oficiales desde GitHub Releases
+          • Windows : Packwire-Setup.exe (Instalador con asistente)
+                      packwire-windows-x64.zip (Portable sin instalación)
+          • Linux   : packwire-linux-x64.tar.gz (Binario ejecutable)
+          • macOS   : packwire-macos-universal.tar.gz (Binario universal)
+
+                                    │ NO (Soy Desarrollador)
+                                    ▼
+       👉 MÉTODOS 2, 3 y 4: Scripts de automatización o pip editable
+          • Windows : install.bat / install.ps1
+          • POSIX   : install.sh (Linux & macOS)
+          • Python  : pip install -e . && packwire setup
 ```
 
 ---
 
-### Método 1: Script de Un Clic para Windows (`install.bat` / `install.ps1`)
-
-Este método es el más rápido y recomendado para usuarios y desarrolladores en Windows.
-
-#### Opción A: Doble Clic (Sin Consola)
-1. Localiza el archivo [`install.bat`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.bat) en la carpeta raíz del proyecto.
-2. Haz **doble clic** sobre `install.bat`.
-3. El script detectará tu instalación de Python, instalará las dependencias en modo editable (`pip install -e .`), generará los shims en `%APPDATA%\packwire\shims`, registrará la ruta en el `PATH` del usuario y creará el acceso directo en el Escritorio.
-4. Al culminar, la ventana se pausará informando el resultado para que puedas revisarlo.
-
-#### Opción B: Desde PowerShell
-Abre una ventana de PowerShell y ejecuta:
-
-```powershell
-.\install.ps1 -DesktopShortcut
-```
-
-#### Parámetros soportados por `install.ps1`:
-* `-DesktopShortcut`: Crea el acceso directo de la interfaz gráfica en tu Escritorio (`Packwire.lnk`).
-* `-NoStartMenu`: Omite la creación del acceso en la carpeta de Programas del Menú Inicio.
-* `-NoPath`: Omite la inyección automática de la carpeta de shims en la variable de entorno `PATH` del usuario.
+## 🌟 Método 1 (Recomendado): Binarios Oficiales Precompilados
 
 > [!TIP]
-> **Política de Ejecución de PowerShell:** Si tu equipo tiene restringida la ejecución de scripts (`Restricted`), `install.bat` invoca automáticamente PowerShell con la directiva `-ExecutionPolicy Bypass`, garantizando la instalación sin necesidad de alterar la directiva global de seguridad del sistema.
+> **Sin dependencias ni código fuente:** Este método **NO requiere tener Python instalado** ni descargar el repositorio. Los binarios son compilados de forma determinista mediante GitHub Actions e incluyen todo lo necesario para funcionar de inmediato.
+
+Todos los binarios se encuentran disponibles en:  
+👉 **[GitHub Releases Oficiales de Packwire](https://github.com/GrandKenzy/packwire/releases/latest)**
 
 ---
 
-### Método 2: Script Universal para Linux y macOS (`install.sh`)
+### A. En Windows
 
-Para sistemas basados en Unix (distribuciones Linux como Ubuntu, Debian, Fedora, Arch y macOS), Packwire incluye el script automatizado [`install.sh`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.sh).
+Dispones de dos opciones según tu preferencia:
 
-1. Abre tu terminal y sitúate en la raíz del proyecto.
-2. Otorga permisos de ejecución al script:
-   ```bash
-   chmod +x install.sh
+#### Opción 1: Asistente de Instalación Gráfico (`Packwire-Setup.exe`)
+1. Descarga **`Packwire-Setup.exe`** (o `Packwire-Setup-vX.Y.Z.exe`) desde la página de Releases.
+2. Haz doble clic en el instalador descargado.
+3. Selecciona tu idioma preferido (Español o Inglés).
+4. El asistente configurará automáticamente:
+   - Instalación segura en el espacio de usuario (`%LOCALAPPDATA%\Programs\Packwire`).
+   - **Acceso directo en el Escritorio** y en el **Menú Inicio**.
+   - Integración directa en la variable de entorno **PATH** del usuario.
+   - Registro en *Configuración > Aplicaciones instaladas* de Windows para desinstalación con un clic.
+5. Abre cualquier consola (PowerShell, CMD o Terminal) y escribe `packwire --help` para comenzar.
+
+#### Opción 2: Versión Portable (`packwire-windows-x64.zip`)
+Si no deseas instalar nada en el sistema o prefieres llevar Packwire en una memoria USB:
+1. Descarga **`packwire-windows-x64.zip`**.
+2. Extrae el contenido en la carpeta que desees.
+3. Dentro encontrarás el ejecutable autónomo `packwire.exe` (14.2 MB).
+4. Puedes ejecutarlo directamente desde la terminal o hacer doble clic para inicializarlo:
+   ```cmd
+   .\packwire.exe setup --desktop
    ```
-3. Ejecuta el instalador con las opciones deseadas:
-   ```bash
-   ./install.sh --desktop
-   ```
-
-#### Acciones automáticas efectuadas por `install.sh`:
-* Detecta la presencia de `python3` (versión 3.9 o superior) y `pip`.
-* Instala Packwire y sus dependencias (`pywebview`, `bottle`).
-* Compila los shims POSIX ejecutables (`0755`) en `~/.local/share/packwire/shims`.
-* Añade la directiva de exportación en tus archivos de perfil de shell (`~/.bashrc`, `~/.zshrc`, `~/.profile`).
-* En Linux, crea el lanzador de escritorio `~/.local/share/applications/packwire.desktop` y en el Escritorio.
-* En macOS, genera el acceso directo ejecutable `~/Desktop/Packwire.command`.
-
-> [!IMPORTANT]
-> **Activación inmediata en terminal abierta:** Tras finalizar la ejecución de `install.sh`, recarga tu archivo de configuración de terminal para que el comando `packwire` esté disponible de inmediato:
-> ```bash
-> source ~/.bashrc   # En Linux / Bash
-> source ~/.zshrc    # En macOS / Zsh
-> ```
 
 ---
 
-### Método 3: Instalación Estándar vía Python (`pip`)
+### B. En Linux
 
-Si prefieres gestionar la instalación manualmente o dentro de un entorno virtual (`venv` / `conda`):
-
-1. **Instalar el paquete con pip:**
+1. Descarga el archivo comprimido **`packwire-linux-x64.tar.gz`** desde GitHub Releases.
+2. Abre una terminal en tu carpeta de descargas y ejecuta:
    ```bash
-   # Modo normal
-   pip install .
+   # 1. Extraer el binario
+   tar -xzf packwire-linux-x64.tar.gz
 
-   # O en modo editable para desarrollo continuo:
-   pip install -e .
+   # 2. Asignar permisos de ejecución
+   chmod +x packwire
+
+   # 3. Mover a una carpeta en tu PATH de usuario
+   mkdir -p ~/.local/bin
+   mv packwire ~/.local/bin/
+
+   # 4. Inicializar shims y accesos directos
+   packwire setup --desktop
+   ```
+3. Si `~/.local/bin` no está en tu PATH, agrégalo a tu `~/.bashrc`:
+   ```bash
+   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+   source ~/.bashrc
    ```
 
-2. **Ejecutar la inicialización e integración del sistema:**
-   Invoca el comando `setup` para generar los shims maestros, registrar las rutas de entorno y configurar los accesos de escritorio:
+---
+
+### C. En macOS
+
+1. Descarga el paquete **`packwire-macos-universal.tar.gz`** desde GitHub Releases.
+2. Abre la terminal y ejecuta:
    ```bash
+   # 1. Extraer el binario
+   tar -xzf packwire-macos-universal.tar.gz
+
+   # 2. Asignar permisos
+   chmod +x packwire
+
+   # 3. Mover a la ruta de ejecutables del sistema o usuario
+   sudo mv packwire /usr/local/bin/  # O mv packwire ~/.local/bin/
+
+   # 4. Inicializar shims y accesos
    packwire setup --desktop
    ```
 
-   Si tu terminal aún no tiene la ruta de scripts de Python en el `PATH`, puedes invocarlo directamente a través del intérprete:
-   ```bash
-   python -m packwire setup --desktop
-   ```
+---
 
-#### Banderas disponibles en `packwire setup`:
-* `--desktop`: Genera el acceso directo en el Escritorio.
-* `--no-start-menu`: Omite la creación de entradas en el Menú Inicio / Lanzador de aplicaciones.
-* `--no-path`: Omite la modificación de la variable de entorno `PATH`.
+## 🛠️ Métodos para Desarrolladores (Desde el Código Fuente)
+
+Si deseas colaborar en el desarrollo de Packwire, modificar manifiestos o extender el núcleo, utiliza los métodos basados en repositorio.
+
+### Método 2: Scripts de Un Clic para Windows (`install.bat` / `install.ps1`)
+
+Requiere tener Python 3.9+ instalado en el sistema.
+
+* **Por doble clic:** Haz doble clic sobre [`install.bat`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.bat) en la raíz del proyecto.
+* **Desde PowerShell:**
+  ```powershell
+  .\install.ps1 -DesktopShortcut
+  ```
+  *Banderas disponibles:* `-DesktopShortcut`, `-NoStartMenu`, `-NoPath`.
+
+> [!NOTE]
+> `install.bat` invoca automáticamente PowerShell con la directiva `-ExecutionPolicy Bypass`, evitando bloqueos de seguridad por políticas de ejecución locales de Windows.
 
 ---
 
-### Método 4: Asistente Gráfico de Windows (`Packwire-Setup.exe` Inno Setup)
+### Método 3: Script Universal POSIX para Linux y macOS (`install.sh`)
 
-Para usuarios finales o entornos corporativos donde no se dispone de Python preinstalado:
+Requiere `python3` (3.9+) y `pip`.
 
-#### Opción A: Descargar el Binario Oficial Precompilado
-1. Ve a la sección de **Releases** en GitHub: `https://github.com/GrandKenzy/packwire/releases`.
-2. Descarga el instalador más reciente: `Packwire-Setup.exe` (o `Packwire-Setup-vX.Y.Z.exe`).
-3. Ejecuta el archivo descargado y sigue las instrucciones del asistente en pantalla:
-   * El asistente permite seleccionar idioma (Español o Inglés).
-   * Se instala en `{localappdata}\Programs\Packwire` sin requerir derechos de administrador.
-   * Ofrece casillas de verificación para crear el icono en el Escritorio y registrar el binario en el `PATH` del usuario.
-   * Registra automáticamente la entrada de desinstalación en *Configuración > Aplicaciones instaladas*.
-
-#### Opción B: Compilarlo tú mismo desde el código fuente
-1. Compila el ejecutable independiente:
-   ```bash
-   packwire build --exe
-   ```
-2. Compila el instalador con Inno Setup (`iscc`):
-   ```cmd
-   iscc installer.iss
-   ```
-3. Ejecuta el archivo generado en `dist/Packwire-Setup.exe`.
+```bash
+chmod +x install.sh
+./install.sh --desktop
+source ~/.bashrc   # o source ~/.zshrc en macOS
+```
 
 ---
 
-### Método 5: Ejecutable Autónomo Portátil (`packwire.exe`)
+### Método 4: Instalación vía Pip en Entornos Virtuales
 
-Si necesitas un ejecutable que puedas llevar en una memoria USB o ejecutar sin asistente de instalación:
+Para entornos aislados (`venv` o `conda`):
 
-1. Compila el ejecutable con:
-   ```bash
-   packwire build --exe
-   ```
-2. El binario resultante se encuentra en `dist/packwire.exe` (peso optimizado de ~14.2 MB).
-3. Puedes copiar `packwire.exe` a cualquier ubicación o carpeta en tu `PATH` y ejecutarlo directamente:
-   ```cmd
-   packwire.exe --help
-   packwire.exe ui
-   ```
+```bash
+# Modo editable para desarrollo:
+pip install -e .
+
+# Inicializar shims del sistema y accesos directos:
+packwire setup --desktop
+```
 
 ---
 
 ## ✅ Verificación de la Instalación
 
-Una vez instalado, abre una nueva ventana de terminal y comprueba que Packwire responde correctamente:
+Una vez instalado (por cualquiera de los métodos), abre una nueva ventana de terminal y comprueba su funcionamiento:
 
-1. **Comprobar la versión y ayuda general:**
+1. **Comprobar la versión y ayuda:**
    ```bash
    packwire --help
    ```
 
-2. **Comprobar la configuración del directorio de Shims y PATH:**
+2. **Comprobar el estado del directorio de Shims y PATH:**
    ```bash
    packwire path
    ```
-   Si la ruta no estuviese registrada en tu sesión actual, puedes forzar su registro con:
+   Si la ruta de shims no está activa en tu sesión:
    ```bash
    packwire path --add
    ```
 
-3. **Consultar el catálogo de paquetes disponibles:**
+3. **Explorar el catálogo de paquetes:**
    ```bash
    packwire available
    ```
 
-4. **Probar una instalación desatendida:**
+4. **Instalar un entorno de prueba:**
    ```bash
    packwire install python@stable --mode here
    ```
 
 5. **Lanzar la interfaz gráfica:**
    ```bash
-   # Ventana nativa acelerada por hardware
+   # Ventana nativa acelerada por hardware:
    packwire ui
 
    # O en modo servidor web en tu navegador:
@@ -210,17 +198,13 @@ Una vez instalado, abre una nueva ventana de terminal y comprueba que Packwire r
 
 ## 🔄 Actualización de Packwire
 
-* **Si instalaste en modo editable (`pip install -e .`):**
-  Solo necesitas actualizar tu repositorio git:
+* **Usuarios de Binarios Precompilados:** Simplemente descarga el nuevo instalador o binario desde [GitHub Releases](https://github.com/GrandKenzy/packwire/releases/latest) y ejecútalo; reemplazará la versión previa conservando todas tus herramientas instaladas.
+* **Usuarios de Repositorio Git:**
   ```bash
   git pull origin main
+  pip install -e .
   ```
-* **Si instalaste como paquete normal:**
-  ```bash
-  pip install --upgrade .
-  packwire setup
-  ```
-* **Para actualizar los paquetes instalados por Packwire (canal `stable`):**
+* **Para actualizar los paquetes gestionados por Packwire:**
   ```bash
   packwire update
   ```
@@ -229,58 +213,37 @@ Una vez instalado, abre una nueva ventana de terminal y comprueba que Packwire r
 
 ## 🗑️ Desinstalación Completa y Limpieza
 
-Packwire incluye mecanismos de desinstalación limpia y reversible:
+### Desde Windows con Asistente
+Si instalaste mediante `Packwire-Setup.exe`, dirígete a:
+> **Configuración > Aplicaciones > Aplicaciones instaladas > Packwire > Desinstalar**
 
-### Desinstalación mediante CLI
-Para eliminar completamente todos los paquetes descargados, los shims generados, la caché temporal y retirar la ruta del `PATH` del usuario:
+El desinstalador purgará automáticamente los binarios y revertirá el registro de variables de entorno.
 
+### Mediante la Consola (Cualquier Plataforma)
+Para desinstalar todos los paquetes gestionados, eliminar shims, cachés y retirar la ruta del `PATH`:
 ```bash
 packwire remove --all
 ```
 
-Si deseas desinstalar los paquetes pero conservar la ruta de shims en el `PATH`:
-```bash
-packwire remove --all --keep-path
-```
-
-### Desinstalación del paquete de Python
-```bash
-pip uninstall packwire -y
-```
-
-### Rutas de datos residuales (limpieza manual si fuera necesaria):
-* **En Windows:** Eliminar la carpeta `%APPDATA%\packwire` (usualmente `C:\Users\<usuario>\AppData\Roaming\packwire`).
-* **En Linux y macOS:** Eliminar el directorio `~/.local/share/packwire`.
-
 ---
 
-## 🛠️ Solución de Problemas Frecuentes (Troubleshooting)
+## 🛠️ Solución de Problemas Frecuentes
 
-### 1. "El término 'packwire' no se reconoce como un cmdlet, función..."
-* **Causa:** La variable de entorno `PATH` fue modificada pero la terminal actual aún no ha recargado las variables de entorno.
-* **Solución:**
-  * **En Windows:** Cierra y vuelve a abrir tu terminal (PowerShell o CMD). Las variables modificadas en `HKCU\Environment` se cargarán en las nuevas ventanas.
-  * **En Linux / macOS:** Ejecuta `source ~/.bashrc` o `source ~/.zshrc`.
-  * Si persiste, ejecuta `python -m packwire path --add`.
+### 1. "El comando 'packwire' no se reconoce"
+* **Causa:** La terminal actual se abrió antes de actualizar la variable de entorno `PATH`.
+* **Solución:** Cierra todas las ventanas de terminal y vuelve a abrir una nueva ventana. En Linux/macOS ejecuta `source ~/.bashrc` o `source ~/.zshrc`.
 
-### 2. Error de política de ejecución de scripts en PowerShell (`PSSecurityException`)
-* **Causa:** PowerShell restringe la ejecución de scripts no firmados por defecto (`Restricted`).
-* **Solución:** Ejecuta el script especificando bypass puntual:
-  ```powershell
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -DesktopShortcut
+### 2. Advertencia de SmartScreen en Windows al abrir el instalador
+* **Causa:** En versiones recientes de software de código abierto recién publicado, Windows SmartScreen advierte sobre ejecutables que aún están construyendo reputación en la nube de Microsoft Defender.
+* **Solución:** Haz clic en **"Más información"** y luego en **"Ejecutar de todas formas"**.
+
+### 3. Faltan dependencias de ventana nativa en Linux
+* **Causa:** Algunas distribuciones mínimas de Linux no incluyen WebKitGTK.
+* **Solución:** Instala la librería del sistema:
+  ```bash
+  sudo apt-get install libwebkit2gtk-4.0-37  # Debian/Ubuntu
   ```
-  O utiliza directamente [`install.bat`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/install.bat), el cual aplica este bypass automáticamente.
-
-### 3. "Python no fue encontrado en el sistema"
-* **Causa:** Python no está instalado o no se marcó la opción *"Add python.exe to PATH"* durante su instalación.
-* **Solución:** Instala Python 3.9 o superior desde [python.org](https://www.python.org/) y asegúrate de marcar la casilla de verificación para agregarlo al `PATH`.
-
-### 4. Error al iniciar la ventana gráfica (`ERR_WEBVIEW_INIT`)
-* **Causa:** En sistemas Windows mínimos (Windows Server, LTSC) puede faltar el runtime de Microsoft Edge WebView2. En Linux puede faltar `libwebkit2gtk`.
-* **Solución:**
-  * En Windows: Descarga e instala Microsoft Edge WebView2 Runtime (evergreen).
-  * En Linux (Ubuntu/Debian): `sudo apt-get install libwebkit2gtk-4.0-37` (o `libwebkit2gtk-4.1-0`).
-  * **Alternativa inmediata:** Inicia Packwire en modo servidor web sin requerir ventana nativa:
-    ```bash
-    packwire ui --web
-    ```
+  O ejecuta Packwire directamente en el navegador:
+  ```bash
+  packwire ui --web
+  ```

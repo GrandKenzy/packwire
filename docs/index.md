@@ -59,23 +59,26 @@ El núcleo de Packwire se organiza en capas jerárquicas estrictamente delimitad
 
 Para ver la guía exhaustiva con resolución de problemas y opciones avanzadas, consulta la **[Guía Completa de Instalación](04-Distribucion/guia_instalacion.md)**.
 
-### Instalación Rápida en Windows
+### 🌟 Opción 1: Binarios Oficiales Precompilados (Recomendado - Sin Python)
 
-Desde el Explorador de Archivos (doble clic) o consola:
+Descarga los instaladores y ejecutables autónomos desde **[GitHub Releases](https://github.com/GrandKenzy/packwire/releases/latest)**:
+* **Windows:** Descarga y ejecuta `Packwire-Setup.exe` (instalador con asistente) o `packwire-windows-x64.zip` (portable).
+* **Linux:** Descarga `packwire-linux-x64.tar.gz`, extrae y mueve el ejecutable a `~/.local/bin/`.
+* **macOS:** Descarga `packwire-macos-universal.tar.gz`, extrae y mueve el ejecutable a `/usr/local/bin/`.
 
-```cmd
-install.bat
-```
+---
 
-O utilizando PowerShell directamente:
+### 🛠️ Opción 2: Desde el Código Fuente (Desarrolladores)
+
+#### En Windows
+Desde el Explorador de Archivos (doble clic) en `install.bat`, o mediante PowerShell:
 
 ```powershell
 .\install.ps1 -DesktopShortcut
 ```
 
-### Instalación Rápida en Linux y macOS
-
-Mediante el instalador POSIX:
+#### En Linux y macOS
+Mediante el script POSIX:
 
 ```bash
 chmod +x install.sh

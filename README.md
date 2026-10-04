@@ -118,23 +118,40 @@ packwire ui --web
 
 ---
 
-## 📦 Instalación y Empaquetado
+## 📦 Instalación y Descarga
 
-> 📖 **Documentación completa:** Para instrucciones detalladas, requisitos y solución de problemas, consulta la [Guía Completa de Instalación](docs/04-Distribucion/guia_instalacion.md).
+> 📖 **Documentación completa:** Para instrucciones detalladas y solución de problemas, consulta la [Guía Completa de Instalación](docs/04-Distribucion/guia_instalacion.md).
 
-### 1. Instalación Rápida en Windows
+### 🌟 Método Recomendado: Binarios Oficiales Precompilados (Sin Python / Sin Código Fuente)
+
+No necesitas tener Python instalado ni lidiar con el código fuente del proyecto. Puedes descargar los binarios oficiales compilados automáticamente desde:  
+👉 **[GitHub Releases de Packwire](https://github.com/GrandKenzy/packwire/releases/latest)**
+
+* **Windows:**
+  - **Instalador con Asistente:** Descarga `Packwire-Setup.exe` y sigue el asistente gráfico (agrega al `PATH`, crea accesos directos y permite desinstalación limpia desde Windows).
+  - **Portable:** Descarga `packwire-windows-x64.zip`, descomprime y usa `packwire.exe` directamente.
+* **Linux:** Descarga `packwire-linux-x64.tar.gz`, extrae el binario y muévelo a `~/.local/bin/`.
+* **macOS:** Descarga `packwire-macos-universal.tar.gz`, extrae el binario y muévelo a `/usr/local/bin/`.
+
+---
+
+### 🛠️ Para Desarrolladores (Desde el Código Fuente)
+
+Si deseas colaborar o trabajar directamente sobre el código:
+
+#### En Windows:
 - **Doble clic en `install.bat`** o ejecutar en PowerShell:
   ```powershell
   .\install.ps1 -DesktopShortcut
   ```
-- O si ya tienes el repositorio:
+- O instalar mediante `pip` en modo editable:
   ```bash
   pip install -e .
   packwire setup --desktop
   ```
 
-### 2. Instalación Rápida en Linux y macOS
-- Ejecutar el instalador POSIX:
+#### En Linux y macOS:
+- Ejecutar el instalador POSIX automatizado:
   ```bash
   chmod +x install.sh
   ./install.sh --desktop
