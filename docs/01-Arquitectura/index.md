@@ -1,6 +1,6 @@
 # Arquitectura del Sistema
 
-La sección de Arquitectura expone los fundamentos estructurales, directrices de diseño y patrones de ingeniería que rigen la operación interna de Packwire. El sistema ha sido concebido bajo principios de modularidad estricta, determinismo en el estado del entorno de ejecución e idempotencia en las operaciones sobre el sistema de archivos de Windows.
+La sección de Arquitectura expone los fundamentos estructurales, directrices de diseño y patrones de ingeniería que rigen la operación interna de Packwire. El sistema ha sido concebido bajo principios de modularidad estricta, determinismo en el estado del entorno de ejecución e idempotencia en las operaciones sobre el sistema de archivos anfitrión (Windows, Linux y macOS).
 
 A través de esta sección se analizan las interacciones entre los componentes del núcleo, la estrategia de desacoplamiento de dependencias y los mecanismos implementados para garantizar la integridad del sistema operativo anfitrión sin requerir privilegios de superusuario para las operaciones cotidianas.
 

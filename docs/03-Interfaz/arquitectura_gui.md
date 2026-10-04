@@ -47,7 +47,7 @@ window = webview.create_window(
 webview.start(debug=False)
 ```
 
-* **Motor en Windows:** Utiliza Microsoft Edge WebView2 (motor Chromium integrado en Windows 10 y Windows 11).
+* **Motores de Renderizado Nativos:** Utiliza Microsoft Edge WebView2 en Windows (Chromium nativo), WebKitGTK en Linux (`libwebkit2gtk-4.0`/`4.1`) y Safari WebKit en macOS.
 * **Consumo de Memoria:** Entre 40 MB y 70 MB de RAM (aproximadamente una quinta parte del consumo base de una aplicación Electron equivalente).
 * **Inyección de API:** La propiedad `js_api` expone la instancia de `GuiBridge` directamente al objeto global `window.pywebview.api` dentro del contexto de JavaScript.
 

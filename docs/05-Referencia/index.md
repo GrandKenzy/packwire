@@ -20,4 +20,4 @@ A través de estos documentos se especifican exhaustivamente la sintaxis de todo
 | :--- | :--- | :--- |
 | **CLI** | Automatización, terminal interactiva y scripts batch/PowerShell. | `packwire <comando> [opciones]` o `python -m packwire` |
 | **API Python** | Integración en proyectos, scripts de DevOps y extensiones. | `import packwire` |
-| **Diagnósticos** | Análisis de incidencias, logs de instalación y depuración. | Registros en `%APPDATA%\packwire\state.json` y consola |
+| **Diagnósticos** | Análisis de incidencias, logs de instalación y depuración. | `%APPDATA%\packwire\state.json` (Windows) o `~/.local/share/packwire/state.json` (POSIX) |

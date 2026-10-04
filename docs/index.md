@@ -42,7 +42,8 @@ El núcleo de Packwire se organiza en capas jerárquicas estrictamente delimitad
 
 ### 4. Empaquetado y Distribución
 * **[General de Distribución](04-Distribucion/index.md):** Modelos de despliegue para administradores y usuarios finales.
-* **[Integración en el Sistema](04-Distribucion/instalacion_sistema.md):** Instalador propio, inyección de shims y accesos directos en Windows, Linux y macOS.
+* **[Guía Completa de Instalación](04-Distribucion/guia_instalacion.md):** Manual paso a paso multiplataforma para Windows, Linux y macOS (scripts rápidos, pip, standalone y setup nativo).
+* **[Integración en el Sistema](04-Distribucion/instalacion_sistema.md):** Arquitectura de shims, registro en `PATH` y accesos directos en Windows, Linux y macOS.
 * **[Empaquetador PyInstaller](04-Distribucion/empaquetador_pyinstaller.md):** Construcción de `packwire.exe` standalone con resolución `_MEIPASS`.
 * **[Instalador Inno Setup](04-Distribucion/instalador_inno_setup.md):** Compilación del instalador gráfico nativo para entornos empresariales.
 
@@ -54,11 +55,13 @@ El núcleo de Packwire se organiza en capas jerárquicas estrictamente delimitad
 
 ---
 
-## 📦 Inicio Rápido
+## 📦 Inicio Rápido e Instalación
 
-### Instalación en Windows
+Para ver la guía exhaustiva con resolución de problemas y opciones avanzadas, consulta la **[Guía Completa de Instalación](04-Distribucion/guia_instalacion.md)**.
 
-Desde una consola de comandos o ejecutando directamente en el Explorador de Archivos:
+### Instalación Rápida en Windows
+
+Desde el Explorador de Archivos (doble clic) o consola:
 
 ```cmd
 install.bat
@@ -70,13 +73,21 @@ O utilizando PowerShell directamente:
 .\install.ps1 -DesktopShortcut
 ```
 
-### Instalación en Linux y macOS
+### Instalación Rápida en Linux y macOS
 
 Mediante el instalador POSIX:
 
 ```bash
 chmod +x install.sh
 ./install.sh --desktop
+source ~/.bashrc  # o source ~/.zshrc en macOS
+```
+
+### Instalación Manual con Pip
+
+```bash
+pip install -e .
+packwire setup --desktop
 ```
 
 ### Uso Básico desde la Consola

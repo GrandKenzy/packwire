@@ -4,6 +4,9 @@ El subsistema de auto-instalación provee las herramientas necesarias para confi
 
 A diferencia de los instaladores tradicionales que requieren derechos administrativos obligatorios para registrar binarios, la integración de Packwire opera íntegramente dentro del espacio del usuario actual (`HKCU` y `%APPDATA%` en Windows; `~/.local/share/packwire` y archivos de configuración de shell en Linux y macOS), evitando solicitar permisos de elevación para la operativa estándar del gestor.
 
+> [!TIP]
+> Si buscas instrucciones prácticas de instalación paso a paso para usuarios finales, consulta la **[Guía Completa de Instalación](guia_instalacion.md)**. Este documento detalla la especificación interna y arquitectura de `installer_self.py`.
+
 ---
 
 ## ⚙️ Especificación Técnica

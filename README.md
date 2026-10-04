@@ -120,6 +120,8 @@ packwire ui --web
 
 ## 📦 Instalación y Empaquetado
 
+> 📖 **Documentación completa:** Para instrucciones detalladas, requisitos y solución de problemas, consulta la [Guía Completa de Instalación](docs/04-Distribucion/guia_instalacion.md).
+
 ### 1. Instalación Rápida en Windows
 - **Doble clic en `install.bat`** o ejecutar en PowerShell:
   ```powershell

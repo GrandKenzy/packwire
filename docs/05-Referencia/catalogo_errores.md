@@ -20,6 +20,8 @@ Para cada condición se describe su nivel de severidad, el subsistema de origen,
 | `ERR_WEBVIEW_INIT` | Advertencia | GUI (Window) | El sistema carece de Microsoft Edge WebView2 Runtime o el entorno no soporta ventanas nativas. | Instalar WebView2 Runtime oficial o ejecutar Packwire en modo servidor web alternativo mediante `packwire ui --web`. |
 | `ERR_UPSTREAM_TIMEOUT` | Advertencia | Resolver | El servidor upstream oficial (python.org, nodejs.org) no respondió dentro del timeout de 5 segundos. | El resolvedor conmuta a la versión de contingencia local precompilada; verificar la conexión a Internet o proxies corporativos. |
 | `ERR_UNINSTALL_STATE` | Error | UninstallerVisitor | Se intentó desinstalar o reinstalar un paquete que no figura registrado en `state.json`. | Consultar los paquetes válidos instalados mediante `packwire list`. |
+| `ERR_EXEC_POLICY` | Error | Scripts de Instalación | PowerShell bloquea la ejecución de `install.ps1` por política `Restricted`. | Ejecutar con `install.bat` o `powershell -ExecutionPolicy Bypass -File .\install.ps1`. |
+| `ERR_PATH_STALE` | Advertencia | Shell / Terminal | La sesión de terminal actual no ha actualizado su variable `PATH` tras instalar. | Abrir una nueva terminal o ejecutar `source ~/.bashrc` / `source ~/.zshrc`. |
 
 ---
 
