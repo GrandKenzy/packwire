@@ -225,8 +225,5 @@ packwire/
 ├── packwire.spec                 # Especificación de PyInstaller para packwire.exe
 ├── pyproject.toml                # Metadatos del paquete (PEP 517/621)
 ├── setup.py                      # Configuración estándar de distribución
-├── tests/
-│   └── test_packwire.py          # Pruebas unitarias automatizadas
-├── example.py                    # Script de demostración interactiva
 └── README.md
 ```

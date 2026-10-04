@@ -48,9 +48,18 @@ jobs:
           Compress-Archive -Path dist\packwire.exe -DestinationPath dist\packwire-windows-x64.zip -Force
 
       - name: Instalar Inno Setup
-        uses: Minisug/inno-setup-action@v2
-        with:
-          path: installer.iss
+        shell: pwsh
+        run: |
+          choco install innosetup -y
+          $innoDir = "C:\Program Files (x86)\Inno Setup 6"
+          if (Test-Path $innoDir) {
+            echo $innoDir | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+
+      - name: Compilar Instalador Inno Setup
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\iscc.exe" installer.iss
 
       - name: Renombrar Instalador con Versión
         shell: pwsh
@@ -90,7 +99,7 @@ jobs:
       - name: Instalar Dependencias del Sistema y PyInstaller
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential patchelf
+          sudo apt-get install -y build-essential patchelf
           python -m pip install --upgrade pip
           pip install -e .
           pip install pyinstaller wheel
@@ -167,18 +176,21 @@ jobs:
         with:
           name: windows-artifacts
           path: release-assets
+          merge-multiple: true
 
       - name: Descargar Artefactos de Linux
         uses: actions/download-artifact@v4
         with:
           name: linux-artifacts
           path: release-assets
+          merge-multiple: true
 
       - name: Descargar Artefactos de macOS
         uses: actions/download-artifact@v4
         with:
           name: macos-artifacts
           path: release-assets
+          merge-multiple: true
 
       - name: Generar Sumas de Verificación SHA-256
         working-directory: release-assets
