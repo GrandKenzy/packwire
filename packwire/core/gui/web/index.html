@@ -243,6 +243,47 @@
       </div>
     </div>
 
+        <!-- Modal for Documentation Guide -->
+    <div class="modal-overlay" id="guide-modal" style="display: none;">
+      <div class="modal-card guide-modal-card">
+        <div class="modal-header">
+          <h3 id="guide-modal-title">Guía Windows 11: Solución para GCC (as.exe)</h3>
+          <button class="btn-close" id="btn-guide-modal-close">&times;</button>
+        </div>
+        <div class="modal-body guide-modal-content" id="guide-modal-body">
+          <div style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid #ef4444; padding: 14px 16px; border-radius: 0 8px 8px 0; margin-bottom: 18px;">
+            <strong style="color: #fca5a5;">🛡️ ¿Por qué ocurre este problema?</strong>
+            <p style="margin-top: 6px; font-size: 13px; color: var(--text-secondary);">Windows Defender en Windows 11 suele clasificar erróneamente el archivo <code>as.exe</code> (GNU Assembler de GCC) como un falso positivo (comúnmente <em>Trojan:Win32/Wacatac.B!ml</em>) y lo elimina o bloquea su extracción, causando el error <code>gcc: fatal error: cannot execute 'as'</code>.</p>
+          </div>
+
+          <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px;">
+            <strong style="display: block; margin-bottom: 6px;">Paso 1: Añadir Exclusión Automática en Windows Defender</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Usa el botón de exclusión en la pestaña <strong>Sistema y Rutas</strong> de Packwire o ejecuta en tu terminal:</p>
+            <pre style="background: #090d16; color: #38bdf8; padding: 10px 12px; border-radius: 6px; font-family: monospace; font-size: 12px;">packwire fix-defender</pre>
+          </div>
+
+          <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 14px;">
+            <strong style="display: block; margin-bottom: 6px;">Paso 2: Exclusión manual en PowerShell (Administrador)</strong>
+            <pre style="background: #090d16; color: #38bdf8; padding: 10px 12px; border-radius: 6px; font-family: monospace; font-size: 12px;">Add-MpPreference -ExclusionPath "$env:APPDATA\packwire"
+Add-MpPreference -ExclusionProcess "as.exe"
+Add-MpPreference -ExclusionProcess "gcc.exe"</pre>
+          </div>
+
+          <div style="background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+            <strong style="display: block; margin-bottom: 6px;">Paso 3: Recuperar archivo en Seguridad de Windows</strong>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 6px;">Si Defender ya eliminó <code>as.exe</code>: abre <strong>Seguridad de Windows</strong> > <strong>Protección contra virus y amenazas</strong> > <strong>Historial de protección</strong>, haz clic en la amenaza detectada y selecciona <strong>Restaurar</strong>.</p>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <button class="btn btn-outline" id="btn-guide-open-browser">
+            <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            Abrir Guía Completa en Navegador
+          </button>
+          <button class="btn btn-primary" id="btn-guide-modal-done">Entendido</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast Notifications Container -->
     <div class="toast-container" id="toast-container"></div>
   </div>

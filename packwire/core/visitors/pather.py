@@ -129,77 +129,97 @@ class PatherVisitor:
                     print(f"[Packwire Pather] Shim eliminado: {shim_file.name}")
 
     def is_shims_in_path(self) -> bool:
-        """Check if SHIMS_DIR is already present in current session PATH or User Registry PATH."""
-        shims_str = str(self.shims_dir).lower()
-        current_path = os.environ.get("PATH", "").lower()
-        if shims_str in current_path.split(os.pathsep):
-            return True
+        """Check if SHIMS_DIR is actually present in Windows Registry HKCU\\Environment or POSIX profile."""
+        shims_norm = str(self.shims_dir).lower().rstrip("\\/")
 
-        if SYSTEM == "windows" and HAS_WIN32:
-            try:
-                with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_READ) as key:
-                    user_path, _ = winreg.QueryValueEx(key, "Path")
-                    if shims_str in user_path.lower().split(";"):
-                        return True
-            except Exception:
-                pass
-
-        return False
+        if SYSTEM == "windows":
+            if HAS_WIN32:
+                try:
+                    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Environment", 0, winreg.KEY_READ) as key:
+                        user_path, _ = winreg.QueryValueEx(key, "Path")
+                        paths = [p.lower().rstrip("\\/") for p in user_path.split(";") if p.strip()]
+                        if shims_norm in paths:
+                            return True
+                except Exception:
+                    pass
+            current_paths = [p.lower().rstrip("\\/") for p in os.environ.get("PATH", "").split(os.pathsep) if p.strip()]
+            return shims_norm in current_paths
+        else:
+            rc_files = [Path.home() / ".zshrc", Path.home() / ".bashrc", Path.home() / ".profile"]
+            for rc in rc_files:
+                if rc.exists():
+                    try:
+                        content = rc.read_text(encoding="utf-8")
+                        if shims_norm in content.lower():
+                            return True
+                    except Exception:
+                        pass
+            return False
 
     def add_shims_to_user_path(self) -> bool:
         """
         Add SHIMS_DIR to the User PATH.
-        - Windows: Writes to HKCU\\Environment and broadcasts WM_SETTINGCHANGE.
+        - Windows: Writes to HKCU\\Environment, broadcasts WM_SETTINGCHANGE, and syncs via PowerShell.
         - Linux/macOS: Appends export PATH to ~/.bashrc or ~/.zshrc.
         """
-        shims_str = str(self.shims_dir)
+        shims_str = str(self.shims_dir).rstrip("\\/")
+        shims_norm = shims_str.lower()
 
-        if self.is_shims_in_path():
-            print(f"[Packwire Pather] El directorio de shims ya está en el PATH: {shims_str}")
-            return True
+        if SYSTEM == "windows":
+            if HAS_WIN32:
+                try:
+                    with winreg.OpenKey(
+                        winreg.HKEY_CURRENT_USER,
+                        r"Environment",
+                        0,
+                        winreg.KEY_READ | winreg.KEY_WRITE
+                    ) as key:
+                        try:
+                            user_path, val_type = winreg.QueryValueEx(key, "Path")
+                        except FileNotFoundError:
+                            user_path = ""
+                            val_type = winreg.REG_EXPAND_SZ
 
-        if SYSTEM == "windows" and HAS_WIN32:
-            try:
-                with winreg.OpenKey(
-                    winreg.HKEY_CURRENT_USER,
-                    r"Environment",
-                    0,
-                    winreg.KEY_READ | winreg.KEY_WRITE
-                ) as key:
+                        paths = [p for p in user_path.split(";") if p.strip()]
+                        norm_paths = [p.lower().rstrip("\\/") for p in paths]
+                        if shims_norm not in norm_paths:
+                            paths.insert(0, shims_str)
+                            new_path = ";".join(paths)
+                            winreg.SetValueEx(key, "Path", 0, val_type, new_path)
+                            print(f"[Packwire Pather] Añadido exitosamente al PATH del usuario en Windows: {shims_str}")
+
                     try:
-                        user_path, val_type = winreg.QueryValueEx(key, "Path")
-                    except FileNotFoundError:
-                        user_path = ""
-                        val_type = winreg.REG_EXPAND_SZ
+                        HWND_BROADCAST = 0xFFFF
+                        WM_SETTINGCHANGE = 0x001A
+                        SMTO_ABORTIFHUNG = 0x0002
+                        result = ctypes.c_long()
+                        ctypes.windll.user32.SendMessageTimeoutW(
+                            HWND_BROADCAST,
+                            WM_SETTINGCHANGE,
+                            0,
+                            "Environment",
+                            SMTO_ABORTIFHUNG,
+                            5000,
+                            ctypes.byref(result)
+                        )
+                    except Exception:
+                        pass
 
-                    paths = [p for p in user_path.split(";") if p.strip()]
-                    if shims_str not in paths:
-                        paths.insert(0, shims_str)
-                        new_path = ";".join(paths)
-                        winreg.SetValueEx(key, "Path", 0, val_type, new_path)
-                        print(f"[Packwire Pather] Añadido exitosamente al PATH del usuario en Windows: {shims_str}")
+                    try:
+                        ps_code = f'$p = [System.Environment]::GetEnvironmentVariable("Path", "User"); if ($p -notlike "*{shims_str}*") {{ [System.Environment]::SetEnvironmentVariable("Path", "{shims_str};" + $p, "User") }}'
+                        subprocess.run(["powershell", "-NoProfile", "-Command", ps_code], capture_output=True, timeout=5)
+                    except Exception:
+                        pass
 
+                except Exception as e:
+                    print(f"[Packwire Pather] Error al actualizar PATH en el registro: {e}")
+
+            current_paths = [p for p in os.environ.get("PATH", "").split(os.pathsep) if p.strip()]
+            if shims_norm not in [p.lower().rstrip("\\/") for p in current_paths]:
                 os.environ["PATH"] = f"{shims_str}{os.pathsep}{os.environ.get('PATH', '')}"
 
-                HWND_BROADCAST = 0xFFFF
-                WM_SETTINGCHANGE = 0x001A
-                SMTO_ABORTIFHUNG = 0x0002
-                result = ctypes.c_long()
-                ctypes.windll.user32.SendMessageTimeoutW(
-                    HWND_BROADCAST,
-                    WM_SETTINGCHANGE,
-                    0,
-                    "Environment",
-                    SMTO_ABORTIFHUNG,
-                    5000,
-                    ctypes.byref(result)
-                )
-                return True
-            except Exception as e:
-                print(f"[Packwire Pather] Error al actualizar PATH en el registro: {e}")
-                return False
+            return True
         else:
-            # POSIX (Linux/macOS)
             export_line = f'\nexport PATH="{shims_str}:$PATH"\n'
             rc_files = [Path.home() / ".zshrc", Path.home() / ".bashrc", Path.home() / ".profile"]
             written = False
@@ -217,10 +237,70 @@ class PatherVisitor:
             os.environ["PATH"] = f"{shims_str}{os.pathsep}{os.environ.get('PATH', '')}"
             return written or True
 
+    def add_directory_to_user_path(self, target_dir: Path) -> bool:
+        """Add an arbitrary directory (like a compiler bin directory) directly to User PATH."""
+        dir_str = str(target_dir).rstrip("\\/")
+        dir_norm = dir_str.lower()
+
+        if SYSTEM == "windows" and HAS_WIN32:
+            try:
+                with winreg.OpenKey(
+                    winreg.HKEY_CURRENT_USER,
+                    r"Environment",
+                    0,
+                    winreg.KEY_READ | winreg.KEY_WRITE
+                ) as key:
+                    try:
+                        user_path, val_type = winreg.QueryValueEx(key, "Path")
+                    except FileNotFoundError:
+                        user_path = ""
+                        val_type = winreg.REG_EXPAND_SZ
+
+                    paths = [p for p in user_path.split(";") if p.strip()]
+                    norm_paths = [p.lower().rstrip("\\/") for p in paths]
+                    if dir_norm not in norm_paths:
+                        paths.insert(0, dir_str)
+                        new_path = ";".join(paths)
+                        winreg.SetValueEx(key, "Path", 0, val_type, new_path)
+                        print(f"[Packwire Pather] Añadido directorio al PATH del usuario: {dir_str}")
+
+                try:
+                    HWND_BROADCAST = 0xFFFF
+                    WM_SETTINGCHANGE = 0x001A
+                    SMTO_ABORTIFHUNG = 0x0002
+                    result = ctypes.c_long()
+                    ctypes.windll.user32.SendMessageTimeoutW(
+                        HWND_BROADCAST,
+                        WM_SETTINGCHANGE,
+                        0,
+                        "Environment",
+                        SMTO_ABORTIFHUNG,
+                        5000,
+                        ctypes.byref(result)
+                    )
+                except Exception:
+                    pass
+
+                try:
+                    ps_code = f'$p = [System.Environment]::GetEnvironmentVariable("Path", "User"); if ($p -notlike "*{dir_str}*") {{ [System.Environment]::SetEnvironmentVariable("Path", "{dir_str};" + $p, "User") }}'
+                    subprocess.run(["powershell", "-NoProfile", "-Command", ps_code], capture_output=True, timeout=5)
+                except Exception:
+                    pass
+
+                current_paths = [p for p in os.environ.get("PATH", "").split(os.pathsep) if p.strip()]
+                if dir_norm not in [p.lower().rstrip("\\/") for p in current_paths]:
+                    os.environ["PATH"] = f"{dir_str}{os.pathsep}{os.environ.get('PATH', '')}"
+
+                return True
+            except Exception as e:
+                print(f"[Packwire Pather] Error al añadir directorio al PATH: {e}")
+                return False
+        return False
+
     def remove_shims_from_user_path(self) -> bool:
         r"""
         Remove SHIMS_DIR from the User PATH environment variable.
-        - Windows: Removes from HKCU\Environment and broadcasts WM_SETTINGCHANGE.
+        - Windows: Removes from HKCU\\Environment and broadcasts WM_SETTINGCHANGE.
         - Linux/macOS: Removes export line from shell rc files.
         """
         shims_str = str(self.shims_dir).lower()

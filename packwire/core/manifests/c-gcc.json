@@ -13,7 +13,7 @@
     "here": {
       "url": "https://github.com/skeeto/w64devkit/releases/download/v1.23.0/w64devkit-1.23.0.zip",
       "format": "zip",
-      "binaries": ["gcc.exe", "g++.exe", "gdb.exe", "make.exe"],
+      "binaries": ["gcc.exe", "g++.exe", "c++.exe", "cpp.exe", "as.exe", "ld.exe", "gdb.exe", "make.exe", "ar.exe", "ranlib.exe", "windres.exe"],
       "addpath": true
     },
     "site": {

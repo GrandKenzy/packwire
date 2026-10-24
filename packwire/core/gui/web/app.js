@@ -103,6 +103,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   setupEventListeners();
+  setupGuideModalListeners();
 });
 
 async function initApp() {
@@ -518,17 +519,30 @@ function renderCatalog() {
       `;
     }
 
+    const isGccPkg = (pkg.id === 'c-gcc' || pkg.id === 'gcc' || (Array.isArray(pkg.aliases) && pkg.aliases.includes('gcc')));
+    const isWindowsEnv = (currentSystemInfo.is_windows_11 || currentSystemInfo.is_windows || currentSystemInfo.os === 'windows' || navigator.userAgent.includes("Windows") || navigator.platform.includes("Win"));
+
+    const gccBannerHtml = (isGccPkg && isWindowsEnv) ? `
+      <div class="card-gcc-guide" data-guide="gcc_windows11.html" title="Windows 11: Solución para falso positivo en as.exe">
+        <span class="guide-banner-icon">🛡️</span>
+        <span class="guide-banner-text"><strong>Guía Windows 11:</strong> Falso positivo en <code>as.exe</code></span>
+        <button class="btn-guide-pill" type="button">Ver Guía →</button>
+      </div>
+    ` : '';
+
+    const gccQuestionBtn = (isGccPkg && isWindowsEnv) ? `
+      <button class="btn-guide-help" data-guide="gcc_windows11.html" title="Windows 11: Guía para resolver falso positivo de Windows Defender en as.exe" aria-label="Ayuda para Windows 11">?</button>
+    ` : '';
+
     card.innerHTML = `
       <div>
         <div class="card-top">
           <div class="pkg-title-area">
             ${renderIconHtml(pkg.icon)}
-            <div>
-              <div class="pkg-name">
-                ${pkg.name}
-                ${(pkg.id === 'c-gcc' || pkg.id === 'gcc' || (Array.isArray(pkg.aliases) && pkg.aliases.includes('gcc'))) && (currentSystemInfo.is_windows_11 || currentSystemInfo.is_windows || currentSystemInfo.os === 'windows') ? `
-                  <button class="btn-guide-help" data-guide="gcc_windows11.html" title="Windows 11: Guía para resolver falso positivo de Windows Defender en as.exe" aria-label="Ayuda para Windows 11">?</button>
-                ` : ''}
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; align-items: center;">
+                <div class="pkg-name">${pkg.name}</div>
+                ${gccQuestionBtn}
               </div>
               <div class="pkg-version">v${pkg.version || 'auto'}</div>
             </div>
@@ -536,6 +550,7 @@ function renderCatalog() {
           <span class="pkg-type-pill ${typeClass}">${typeLabel}</span>
         </div>
         <p class="pkg-desc">${pkg.description || 'Paquete de desarrollo oficial listo para instalar.'}</p>
+        ${gccBannerHtml}
       </div>
       <div class="card-actions">
         ${actionsHtml}
@@ -552,14 +567,13 @@ function renderCatalog() {
       btnSite.addEventListener("click", () => startInstall(pkg, "site"));
     }
 
-    const btnGuide = card.querySelector(".btn-guide-help");
-    if (btnGuide) {
-      btnGuide.addEventListener("click", (e) => {
+    const guideElements = card.querySelectorAll(".btn-guide-help, .card-gcc-guide, .btn-guide-pill");
+    guideElements.forEach(el => {
+      el.addEventListener("click", (e) => {
         e.stopPropagation();
-        const guideName = btnGuide.getAttribute("data-guide") || "gcc_windows11.html";
-        API.openGuide(guideName);
+        openGuideModal("gcc_windows11.html");
       });
-    }
+    });
 
     catalogCardsEl.appendChild(card);
   });
@@ -998,4 +1012,30 @@ function showToast(message, type = "info") {
     toast.style.transition = "all 0.25s ease";
     setTimeout(() => toast.remove(), 250);
   }, 4000);
+}
+
+
+function openGuideModal(guideName) {
+  const modal = document.getElementById("guide-modal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+function setupGuideModalListeners() {
+  const modal = document.getElementById("guide-modal");
+  const btnClose = document.getElementById("btn-guide-modal-close");
+  const btnDone = document.getElementById("btn-guide-modal-done");
+  const btnBrowser = document.getElementById("btn-guide-open-browser");
+
+  if (btnClose) btnClose.addEventListener("click", () => { if (modal) modal.style.display = "none"; });
+  if (btnDone) btnDone.addEventListener("click", () => { if (modal) modal.style.display = "none"; });
+  if (btnBrowser) btnBrowser.addEventListener("click", () => {
+    API.openGuide("gcc_windows11.html");
+  });
+  if (modal) {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+  }
 }
