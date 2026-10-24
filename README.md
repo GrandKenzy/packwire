@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="badge/banner.jpg" alt="Packwire - Centralized Package & Tool Manager" width="100%">
+</p>
+
 # Packwire 📦⚡
 
 Gestor y descargador moderno de paquetes y entornos de desarrollo para Windows, Linux y macOS.
