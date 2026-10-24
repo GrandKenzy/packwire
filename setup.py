@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="packwire",
-    version="0.1.0",
+    version="0.1.3",
     description="Gestor y descargador moderno, elegante y portátil de paquetes para Windows",
     author="Packwire Team",
     packages=find_packages(),

@@ -1,10 +1,11 @@
 import os
 import sys
 import stat
+import subprocess
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
-from packwire.core.config import SHIMS_DIR, SYSTEM, ensure_directories
+from packwire.core.config import SHIMS_DIR, PACKWIRE_ROOT, SYSTEM, ensure_directories
 
 # Optional Windows-specific imports
 try:
@@ -283,3 +284,54 @@ class PatherVisitor:
             current_paths = [p for p in os.environ.get("PATH", "").split(os.pathsep) if p.strip()]
             os.environ["PATH"] = os.pathsep.join([p for p in current_paths if p.strip().lower() != shims_str])
             return True
+
+
+    def add_defender_exclusion(self, path: Optional[Path] = None) -> Tuple[bool, str]:
+        """
+        Configura exclusión en Windows Defender para Packwire y el proceso as.exe.
+        Previene que el antivirus elimine por falso positivo el ensamblador GNU de GCC.
+        """
+        if SYSTEM != "windows":
+            return False, "La configuración de Windows Defender solo está disponible en Windows."
+
+        target_path = str(path or PACKWIRE_ROOT)
+        ps_commands = (
+            f'Add-MpPreference -ExclusionPath "{target_path}" -ErrorAction SilentlyContinue; '
+            f'Add-MpPreference -ExclusionProcess "as.exe" -ErrorAction SilentlyContinue; '
+            f'Add-MpPreference -ExclusionProcess "gcc.exe" -ErrorAction SilentlyContinue'
+        )
+
+        try:
+            is_admin = False
+            try:
+                if HAS_WIN32:
+                    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+            except Exception:
+                pass
+
+            if is_admin:
+                res = subprocess.run(
+                    ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps_commands],
+                    capture_output=True,
+                    text=True
+                )
+                if res.returncode == 0:
+                    return True, f"Exclusión configurada en Windows Defender para '{target_path}' y proceso 'as.exe'."
+                else:
+                    return False, f"Error al aplicar la exclusión: {res.stderr or res.stdout}"
+            else:
+                encoded_script = ps_commands.replace(chr(34), '`"')
+                elevate_cmd = (
+                    f"Start-Process powershell -Verb RunAs -ArgumentList "
+                    f"'-NoProfile -ExecutionPolicy Bypass -Command \"{encoded_script}\"'"
+                )
+                subprocess.Popen(
+                    ["powershell", "-NoProfile", "-Command", elevate_cmd],
+                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)
+                )
+                return True, (
+                    f"Se ha lanzado la solicitud de elevación (UAC) para añadir la exclusión "
+                    f"en Windows Defender para '{target_path}'."
+                )
+        except Exception as e:
+            return False, f"No se pudo configurar la exclusión en Windows Defender: {e}"

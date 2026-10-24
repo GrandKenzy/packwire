@@ -34,10 +34,13 @@ const API = {
   listJobs() { return this.call("list_jobs"); },
   addPath() { return this.call("add_path"); },
   uninstallAll(removePath = true) { return this.call("uninstall_all", removePath); },
-  openSite(url) { return this.call("open_site", url); }
+  openSite(url) { return this.call("open_site", url); },
+  addDefenderExclusion() { return this.call("add_defender_exclusion"); },
+  openGuide(guideName) { return this.call("open_guide", guideName); }
 };
 
 // Application State
+let currentSystemInfo = {};
 let currentFilter = "all";
 let catalogSearchQuery = "";
 let installedSearchQuery = "";
@@ -228,6 +231,30 @@ function setupEventListeners() {
   document.getElementById("btn-refresh-installed").addEventListener("click", refreshInstalled);
 
   // Fix path button
+  const btnFixDefender = document.getElementById("btn-fix-defender");
+  if (btnFixDefender) {
+    btnFixDefender.addEventListener("click", async () => {
+      btnFixDefender.disabled = true;
+      btnFixDefender.textContent = "Configurando...";
+      try {
+        const res = await API.addDefenderExclusion();
+        if (res && res.success) {
+          showToast(res.message || "Exclusión enviada a Windows Defender.", "success");
+        } else {
+          showToast(res && res.message ? res.message : "No se pudo configurar la exclusión.", "warning");
+        }
+      } catch (err) {
+        showToast("Error: " + err, "error");
+      } finally {
+        btnFixDefender.disabled = false;
+        btnFixDefender.innerHTML = `
+          <svg class="btn-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          Añadir Exclusión en Defender
+        `;
+      }
+    });
+  }
+
   btnFixPath.addEventListener("click", async () => {
     btnFixPath.disabled = true;
     const res = await API.addPath();
@@ -322,6 +349,11 @@ function setupEventListeners() {
 
 async function loadSystemInfo() {
   const info = await API.getSystemInfo();
+  currentSystemInfo = info || {};
+  const versionTag = document.querySelector(".version-tag");
+  if (versionTag && info && info.version) {
+    versionTag.textContent = "v" + info.version;
+  }
   if (!info) return;
 
   const osMap = { windows: "Windows", darwin: "macOS", linux: "Linux" };
@@ -344,6 +376,11 @@ async function loadSystemInfo() {
   document.getElementById("sys-root").textContent = info.root_dir;
   document.getElementById("sys-shims").textContent = info.shims_dir;
   document.getElementById("sys-apps").textContent = info.apps_dir;
+
+  const defenderCard = document.getElementById("defender-exclusion-card");
+  if (defenderCard) {
+    defenderCard.style.display = (info.system === "windows") ? "block" : "none";
+  }
 }
 
 async function refreshCatalog() {
@@ -487,7 +524,12 @@ function renderCatalog() {
           <div class="pkg-title-area">
             ${renderIconHtml(pkg.icon)}
             <div>
-              <div class="pkg-name">${pkg.name}</div>
+              <div class="pkg-name">
+                ${pkg.name}
+                ${(pkg.id === 'c-gcc' || pkg.id === 'gcc' || (Array.isArray(pkg.aliases) && pkg.aliases.includes('gcc'))) && (currentSystemInfo.is_windows_11 || currentSystemInfo.is_windows || currentSystemInfo.os === 'windows') ? `
+                  <button class="btn-guide-help" data-guide="gcc_windows11.html" title="Windows 11: Guía para resolver falso positivo de Windows Defender en as.exe" aria-label="Ayuda para Windows 11">?</button>
+                ` : ''}
+              </div>
               <div class="pkg-version">v${pkg.version || 'auto'}</div>
             </div>
           </div>
@@ -508,6 +550,15 @@ function renderCatalog() {
     const btnSite = card.querySelector(".btn-install-site");
     if (btnSite) {
       btnSite.addEventListener("click", () => startInstall(pkg, "site"));
+    }
+
+    const btnGuide = card.querySelector(".btn-guide-help");
+    if (btnGuide) {
+      btnGuide.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const guideName = btnGuide.getAttribute("data-guide") || "gcc_windows11.html";
+        API.openGuide(guideName);
+      });
     }
 
     catalogCardsEl.appendChild(card);

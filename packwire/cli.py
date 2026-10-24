@@ -72,6 +72,18 @@ def main(args: List[str] = None):
     path_parser = subparsers.add_parser("path", help="Configura o verifica la carpeta de shims en el PATH")
     path_parser.add_argument("--add", action="store_true", help="Añade la carpeta de shims al PATH del usuario")
 
+    # Command: fix-defender / defender
+    defender_parser = subparsers.add_parser(
+        "fix-defender",
+        aliases=["defender", "defender-exclusion"],
+        help="Configura exclusión en Windows Defender para evitar falsos positivos en GCC (as.exe)"
+    )
+    defender_parser.add_argument(
+        "--path",
+        default=None,
+        help="Ruta personalizada a excluir (por defecto: directorio raíz de Packwire)"
+    )
+
     # Command: ui / gui
     ui_parser = subparsers.add_parser("ui", aliases=["gui"], help="Inicia la interfaz gráfica moderna de Packwire")
     ui_parser.add_argument("--web", action="store_true", help="Fuerza el modo servidor web abriendo en el navegador")
@@ -188,6 +200,15 @@ def main(args: List[str] = None):
             in_path = packwire._pather.is_shims_in_path()
             print(f"Directorio de shims: {packwire.SHIMS_DIR}")
             print(f"¿Está en PATH? {'SÍ' if in_path else 'NO (usa --add para agregarlo)'}")
+
+    elif parsed.command in ("fix-defender", "defender", "defender-exclusion"):
+        print("[*] Configurando exclusión en Windows Defender para evitar falsos positivos en GCC/binutils...")
+        ok, msg = packwire.add_defender_exclusion(parsed.path)
+        if ok:
+            print(f"[+] {msg}")
+        else:
+            print(f"[-] {msg}")
+            sys.exit(1)
 
     elif parsed.command in ("ui", "gui"):
         packwire.launch_gui(web_mode=parsed.web, port=parsed.port)

@@ -5,7 +5,7 @@
 ; =====================================================================
 
 #define MyAppName "Packwire"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "0.1.3"
 #define MyAppPublisher "Packwire Team"
 #define MyAppURL "https://github.com/GrandKenzy/packwire"
 #define MyAppExeName "packwire.exe"

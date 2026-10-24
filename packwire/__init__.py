@@ -19,7 +19,7 @@ from packwire.core.visitors.updater import UpdaterVisitor
 from packwire.core.installer import Installer
 from packwire.core.resolver import resolve_manifest
 
-__version__ = "0.1.0"
+__version__ = "0.1.3"
 
 _downloader = DownloaderVisitor()
 _pather = PatherVisitor()
@@ -148,6 +148,11 @@ def add_path() -> bool:
     return _pather.add_shims_to_user_path()
 
 
+def add_defender_exclusion(path: Optional[Path] = None) -> Tuple[bool, str]:
+    """Configure Windows Defender exclusions for Packwire root and as.exe/gcc.exe."""
+    return _pather.add_defender_exclusion(path=path)
+
+
 def launch_gui(web_mode: bool = False, port: int = 5050):
     """Launch the modern HTML/CSS Packwire User Interface."""
     from packwire.core.gui.window import launch_gui as _launch
@@ -167,6 +172,7 @@ __all__ = [
     "list_available",
     "get_manifest",
     "add_path",
+    "add_defender_exclusion",
     "launch_gui",
     "task_queue",
     "TaskQueue",

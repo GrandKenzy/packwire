@@ -14,6 +14,14 @@ class GuiBridge:
     def get_system_info(self) -> Dict[str, Any]:
         """Return system and configuration details."""
         in_path = packwire._pather.is_shims_in_path()
+        is_win11 = False
+        if SYSTEM == "windows":
+            try:
+                import sys
+                winver = sys.getwindowsversion()
+                is_win11 = (winver.major == 10 and winver.build >= 22000) or winver.major > 10
+            except Exception:
+                is_win11 = False
         return {
             "os": SYSTEM,
             "arch": MACHINE,
@@ -21,8 +29,28 @@ class GuiBridge:
             "root_dir": str(PACKWIRE_ROOT),
             "shims_dir": str(SHIMS_DIR),
             "apps_dir": str(APPS_DIR),
-            "version": packwire.__version__
+            "version": packwire.__version__,
+            "is_windows_11": is_win11,
+            "is_windows": SYSTEM == "windows"
         }
+
+    def open_guide(self, guide_name: str) -> Dict[str, Any]:
+        """Open a local documentation guide in user's default browser."""
+        try:
+            from packwire.core.gui.server import get_web_dir
+            web_dir = get_web_dir()
+            guide_path = (web_dir / "guides" / guide_name).resolve()
+            if not guide_path.exists():
+                root_guide = (Path(__file__).resolve().parent.parent.parent.parent / "guides" / guide_name).resolve()
+                if root_guide.exists():
+                    guide_path = root_guide
+            if guide_path.exists():
+                webbrowser.open(guide_path.as_uri())
+                return {"success": True, "path": str(guide_path)}
+            else:
+                return {"success": False, "message": f"Guía no encontrada: {guide_name}"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
 
     def list_available(self) -> List[Dict[str, Any]]:
         """List all packages in catalog with resolved version if stable."""
@@ -133,6 +161,14 @@ class GuiBridge:
                 "success": success,
                 "message": "Directorio de shims añadido al PATH." if success else "No se pudo actualizar el PATH."
             }
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def add_defender_exclusion(self) -> Dict[str, Any]:
+        """Configure Windows Defender exclusion to prevent false positive deletion of as.exe."""
+        try:
+            success, msg = packwire.add_defender_exclusion()
+            return {"success": success, "message": msg}
         except Exception as e:
             return {"success": False, "message": str(e)}
 
