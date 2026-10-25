@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-rocky",
+  "name": "Linux · Rocky Linux (servidores)",
+  "aliases": ["rocky-linux", "rocky", "rhel-compatible"],
+  "icon": "🪨",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Distribución empresarial compatible a nivel binario con RHEL, apropiada para servidores y entornos de infraestructura.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://rockylinux.org/download/"
+    },
+    "clean": true
+  }
+}

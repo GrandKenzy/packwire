@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-opensuse-leap",
+  "name": "Linux · openSUSE Leap (servidores)",
+  "aliases": ["opensuse-leap", "suse-leap", "linux-server"],
+  "icon": "🦎",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Versión regular y conservadora de openSUSE para servidores, estaciones de trabajo y administración estable.",
+  "install": {"mode": "site", "site": {"url": "https://get.opensuse.org/leap/"}, "clean": true}
+}

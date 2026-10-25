@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guía Windows 11: Solución al error de as.exe en GCC - Packwire</title>
+  <title>Guía Windows 10/11: Solución al error de as.exe en GCC - Packwire</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -225,7 +225,7 @@
     <header class="header">
       <div class="header-icon">⚠️</div>
       <div>
-        <h1>Windows 11: Solución al Falso Positivo de as.exe en GCC</h1>
+        <h1>Windows 10/11: Solución al Falso Positivo de as.exe en GCC</h1>
         <p class="header-desc">¿Por qué Windows Defender elimina el archivo <code>as.exe</code> y cómo resolverlo en segundos.</p>
         <span class="badge-pill">Exclusivo para entornos Windows</span>
       </div>
@@ -239,7 +239,7 @@
         En GCC / MinGW (distribuido a través de <em>w64devkit</em>), <strong><code>as.exe</code></strong> es el <strong>GNU Assembler</strong> oficial. Al compilar código C o C++, GCC invoca este programa para transformar código fuente en archivos binarios.
       </p>
       <p style="margin-bottom: 0;">
-        Los motores de inteligencia artificial y protección en tiempo real de <strong>Windows Defender en Windows 11</strong> suelen identificarlo como un falso positivo (comúnmente <em>Trojan:Win32/Wacatac.B!ml</em> o <em>Trojan:Win32/Phonzy</em>) y lo eliminan silenciosamente o bloquean su extracción, causando el error <code>gcc: fatal error: cannot execute 'as': CreateProcess: No such file or directory</code>.
+        Los motores de inteligencia artificial y protección en tiempo real de <strong>Windows Defender en Windows 10/11</strong> pueden identificarlo como un falso positivo (comúnmente <em>Trojan:Win32/Wacatac.B!ml</em> o <em>Trojan:Win32/Phonzy</em>) y bloquear su extracción, causando el error <code>gcc: fatal error: cannot execute 'as': CreateProcess: No such file or directory</code>.
       </p>
     </div>
 
@@ -247,31 +247,18 @@
     <div class="section">
       <div class="section-title">
         <span class="step-number">1</span>
-        <span>Solución Automática con Packwire (Recomendado)</span>
+        <span>Verificación segura con Packwire</span>
       </div>
-      <p>Packwire incluye un comando integrado para configurar automáticamente las exclusiones necesarias en Windows Defender con elevación UAC:</p>
-      <div class="code-snippet">
-        <button class="btn-copy" onclick="copyCode(this, 'packwire fix-defender')">Copiar</button>
-        <code>packwire fix-defender</code>
-      </div>
-      <p>También puedes abrir la interfaz gráfica de Packwire (<code>packwire ui</code>), ir a la pestaña <strong>Sistema y Rutas</strong> y presionar el botón <strong>"Añadir Exclusión en Defender"</strong>.</p>
+      <p>Packwire verifica el SHA-256 del release oficial y no desactiva Defender ni añade exclusiones automáticamente. Si el bloqueo persiste, conserva la protección activa y envía el archivo al análisis de Microsoft como posible falso positivo.</p>
     </div>
 
     <!-- METODO 2 -->
     <div class="section">
       <div class="section-title">
         <span class="step-number">2</span>
-        <span>Solución Manual vía PowerShell (Como Administrador)</span>
+        <span>Revisar el bloqueo en Seguridad de Windows</span>
       </div>
-      <p>Si prefieres ejecutar el comando directamente, abre <strong>PowerShell</strong> como Administrador (clic derecho en Inicio > <em>Terminal (Administrador)</em>) y pega estas líneas:</p>
-      <div class="code-snippet">
-        <button class="btn-copy" onclick="copyCode(this, '$p = \"$env:APPDATA\\packwire\"; Add-MpPreference -ExclusionPath $p; Add-MpPreference -ExclusionProcess \"as.exe\"; Add-MpPreference -ExclusionProcess \"gcc.exe\"')">Copiar</button>
-        <div class="code-comment"># Excluye la carpeta de herramientas de Packwire y los procesos de GCC</div>
-        <code>$p = "$env:APPDATA\packwire"<br>
-Add-MpPreference -ExclusionPath $p<br>
-Add-MpPreference -ExclusionProcess "as.exe"<br>
-Add-MpPreference -ExclusionProcess "gcc.exe"</code>
-      </div>
+      <p>Abre <strong>Seguridad de Windows</strong> &gt; <strong>Protección contra virus y amenazas</strong> &gt; <strong>Historial de protección</strong>. Solo restaura un archivo después de validar su hash y su origen oficial.</p>
     </div>
 
     <!-- METODO 3 -->
@@ -280,7 +267,7 @@ Add-MpPreference -ExclusionProcess "gcc.exe"</code>
         <span class="step-number">3</span>
         <span>Recuperar as.exe si ya fue puesto en cuarentena</span>
       </div>
-      <p>Si Windows Defender ya bloqueó el archivo antes de añadir la exclusión, puedes restaurarlo sin reinstalar:</p>
+      <p>Si Windows Defender ya bloqueó el archivo, revisa el registro y restáuralo solo después de validar el hash y el origen oficial:</p>
       <ol>
         <li>Presiona la tecla <code>Windows</code> y busca <strong>Seguridad de Windows</strong>.</li>
         <li>Entra en <strong>Protección contra virus y amenazas</strong>.</li>
@@ -296,7 +283,7 @@ Add-MpPreference -ExclusionProcess "gcc.exe"</code>
         <span class="step-number">4</span>
         <span>Reinstalar GCC limpiamente</span>
       </div>
-      <p>Una vez aplicada la exclusión, reinstala el paquete de C/C++ para que todos los binarios se extraigan sin bloqueos:</p>
+      <p>Después de resolver el bloqueo, reinstala el paquete de C/C++ para volver a descargar el release estable:</p>
       <div class="code-snippet">
         <button class="btn-copy" onclick="copyCode(this, 'packwire reinstall c-gcc')">Copiar</button>
         <code>packwire reinstall c-gcc</code>

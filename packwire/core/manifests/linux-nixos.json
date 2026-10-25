@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-nixos",
+  "name": "Linux · NixOS (programación avanzada)",
+  "aliases": ["nixos", "linux-nix", "declarative-linux"],
+  "icon": "❄️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Sistema declarativo y reproducible para desarrollo, laboratorios y usuarios avanzados que quieren configuraciones versionables.",
+  "install": {"mode": "site", "site": {"url": "https://nixos.org/download/"}, "clean": true}
+}

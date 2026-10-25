@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-elementary",
+  "name": "Linux · elementary OS (uso personal)",
+  "aliases": ["elementary", "elementary-os", "pantheon"],
+  "icon": "🌿",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Experiencia de escritorio cuidada y minimalista para uso personal; la descarga oficial publica requisitos y versiones actuales.",
+  "install": {"mode": "site", "site": {"url": "https://elementary.io/"}, "clean": true}
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "packwire-v1",
+  "id": "c-clang",
+  "name": "C/C++ (Clang/LLVM)",
+  "aliases": ["clang", "clang++", "llvm"],
+  "icon": "🔷",
+  "type": "stable",
+  "category": "compilers",
+  "description": "Distribución oficial estable de LLVM/Clang para Windows x64, con Clang, clang-cl y LLD.",
+  "upstream": {
+    "source": "github_llvm",
+    "repository": "llvm/llvm-project",
+    "channel": "stable"
+  },
+  "install": {
+    "mode": "here",
+    "here": {
+      "format": "tar.xz",
+      "binaries": ["clang.exe", "clang++.exe", "clang-cl.exe", "lld-link.exe", "llvm-ar.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://github.com/llvm/llvm-project/releases"
+    },
+    "clean": true
+  }
+}

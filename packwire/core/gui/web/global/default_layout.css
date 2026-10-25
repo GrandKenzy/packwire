@@ -253,6 +253,8 @@
   font-family: var(--font-mono);
   font-size: 12px;
   text-transform: none;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   color: var(--text-secondary);
   background-color: var(--surface-subtle);
   padding: 6px 10px;

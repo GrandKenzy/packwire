@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-opensuse-tumbleweed",
+  "name": "Linux · openSUSE Tumbleweed (programación)",
+  "aliases": ["opensuse-tumbleweed", "tumbleweed", "linux-rolling"],
+  "icon": "🦎",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Rolling release con paquetes recientes y snapshots comprobados; adecuada para programación y usuarios avanzados.",
+  "install": {"mode": "site", "site": {"url": "https://get.opensuse.org/tumbleweed/"}, "clean": true}
+}

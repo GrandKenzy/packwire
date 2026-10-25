@@ -52,6 +52,8 @@ El núcleo de Packwire se organiza en capas jerárquicas estrictamente delimitad
 * **[Interfaz de Línea de Comandos (CLI)](05-Referencia/cli.md):** Manual formal exhaustivo de comandos, parámetros y banderas.
 * **[API de Python](05-Referencia/api_python.md):** Firmas de métodos públicos, tipos exportados y contratos del paquete `packwire`.
 * **[Catálogo de Diagnósticos y Errores](05-Referencia/catalogo_errores.md):** Matriz sistemática de códigos de falla, causas raíces y mitigación.
+* **[Catálogo Linux](05-Referencia/catalogo_linux.md):** Distribuciones oficiales recomendadas por perfil de hardware y uso.
+* **[Plan de datos del sistema](05-Referencia/plan_datos_sistema.md):** Qué diagnostica Packwire, para qué sirve cada dato y qué se excluye por privacidad.
 
 ---
 

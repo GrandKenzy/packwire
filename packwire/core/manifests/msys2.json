@@ -6,14 +6,15 @@
   "icon": "🧰",
   "type": "stable",
   "category": "development tools",
-  "description": "Entorno tipo Unix nativo para Windows con GCC, herramientas POSIX y gestor Pacman.",
+  "version": "latest",
+  "description": "Entorno tipo Unix nativo para Windows con el instalador estable de MSYS2 y gestor Pacman.",
+  "auto_update": true,
   "install": {
-    "mode": "here",
-    "here": {
-      "url": "https://github.com/msys2/msys2-installer/releases/download/2024-05-07/msys2-base-x86_64-20240507.tar.xz",
-      "format": "tar",
-      "binaries": ["pacman.exe", "bash.exe", "mintty.exe"],
-      "addpath": true
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; usa packwire install msys2 --mode site para abrir el instalador oficial.' } else { winget install --id MSYS2.MSYS2 -e --source winget --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -ne 0) { winget upgrade --id MSYS2.MSYS2 -e --source winget --accept-source-agreements --accept-package-agreements } }",
+      "binaries": [],
+      "elevated": false
     },
     "site": {
       "url": "https://www.msys2.org/"

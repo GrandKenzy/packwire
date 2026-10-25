@@ -36,7 +36,7 @@ packwire install <package> [--version <ver>] [--channel {stable,fixed}] [--mode 
 | :--- | :--- | :--- | :--- |
 | `package` | Posicional | Sí | Nombre, alias o identificador semántico del paquete (ej. `python`, `git`, `docker`, `c`, `ffmpeg`, `chocolatey`). |
 | `--version`, `-v` | Opción | No | Fuerza una versión exacta específica (ej. `-v 3.12.8`). |
-| `--channel` | Opción | No | Canal de distribución: `stable` (predeterminado) o `fixed`. |
+| `--channel` | Opción | No | Canal de distribución: `stable` (predeterminado) o `fixed`. Los toolchains nuevos usan `stable`. |
 | `--mode`, `-m` | Opción | No | Modo de despliegue: `here` (automático desatendido), `site` (sitio oficial) o `command` (script de consola con elevación). |
 | `--force`, `-f` | Bandera | No | Ignora colisiones preexistentes y fuerza la sobrescritura física de binarios y shims. |
 
@@ -122,13 +122,13 @@ ID                   NOMBRE       VERSIÓN    TIPO     MODO     RUTA
 python@stable        Python       3.14.0     stable   here     C:\...\apps\python@stable
 git                  Git          latest     stable   command  C:\Program Files\Git
 docker               Docker       latest     stable   command  C:\Program Files\Docker
-c-gcc                C/C++ (GCC)  1.23.0     fixed    here     C:\...\apps\c-gcc
+c-gcc                C/C++ (GCC)  latest    stable   here     C:\...\apps\c-gcc
 ```
 
 ---
 
 ### 6. `available`
-Imprime la lista de todos los manifiestos disponibles en el catálogo interno de Packwire (incluyendo Python, Node.js, Git, Docker, GCC, FFmpeg, SDL3, entre otros).
+Imprime la lista de todos los manifiestos disponibles en el catálogo interno de Packwire (incluyendo Python, Node.js, Git, Docker, GCC, MSYS2 UCRT64, Clang, MSVC, Rufus, Ventoy, PowerShell 7 y otros).
 
 ```bash
 packwire available

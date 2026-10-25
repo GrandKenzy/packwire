@@ -1,0 +1,27 @@
+{
+  "$schema": "packwire-v1",
+  "id": "powershell7",
+  "name": "PowerShell 7",
+  "aliases": ["pwsh", "powershell7", "powershell-core"],
+  "icon": "https://raw.githubusercontent.com/PowerShell/PowerShell/master/assets/ps_black_64.svg",
+  "type": "stable",
+  "category": "shells",
+  "description": "Shell y lenguaje de automatización multiplataforma oficial de Microsoft, release estable más reciente para Windows x64.",
+  "upstream": {
+    "source": "github_powershell",
+    "repository": "PowerShell/PowerShell",
+    "channel": "stable"
+  },
+  "install": {
+    "mode": "here",
+    "here": {
+      "format": "zip",
+      "binaries": ["pwsh.exe"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://learn.microsoft.com/powershell/"
+    },
+    "clean": true
+  }
+}

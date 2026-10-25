@@ -147,6 +147,145 @@ class NodeResolver:
         return ver_tag, dl_url, site_url
 
 
+class GitHubReleaseResolver:
+    """Resolve official, non-prerelease assets from a GitHub repository."""
+
+    API_BASE = "https://api.github.com/repos"
+    _cache: Dict[str, list] = {}
+
+    @classmethod
+    def get_releases(cls, repository: str) -> list:
+        if repository in cls._cache:
+            return cls._cache[repository]
+        url = f"{cls.API_BASE}/{repository}/releases?per_page=30"
+        req = urllib.request.Request(url, headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Packwire/0.1.4"
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=15) as res:
+                releases = json.loads(res.read().decode("utf-8"))
+                cls._cache[repository] = releases
+                return releases
+        except Exception as exc:
+            raise RuntimeError(
+                f"No se pudo consultar el catálogo oficial de releases de GitHub ({repository}): {exc}"
+            ) from exc
+
+    @classmethod
+    def resolve(
+        cls,
+        repository: str,
+        asset_pattern: str,
+        version_pattern: str,
+        site_url: str,
+        release_tag: Optional[str] = None,
+    ) -> Tuple[str, str, str, Optional[str]]:
+        asset_re = re.compile(asset_pattern, re.IGNORECASE)
+        version_re = re.compile(version_pattern, re.IGNORECASE)
+        for release in cls.get_releases(repository):
+            if release_tag and release.get("tag_name") != release_tag:
+                continue
+            if release.get("draft") or release.get("prerelease"):
+                continue
+            for asset in release.get("assets", []):
+                asset_name = asset.get("name", "")
+                if not asset_re.fullmatch(asset_name):
+                    continue
+                match = version_re.search(asset_name) or version_re.search(release.get("tag_name", ""))
+                if not match:
+                    continue
+                digest = asset.get("digest") or ""
+                if digest.startswith("sha256:"):
+                    digest = digest.split(":", 1)[1]
+                return (
+                    match.group(1),
+                    asset.get("browser_download_url", ""),
+                    site_url,
+                    digest or None,
+                )
+        raise RuntimeError(
+            f"No se encontró un asset estable compatible en {repository} ({asset_pattern})."
+        )
+
+
+class W64DevKitResolver:
+    @classmethod
+    def resolve_latest(cls) -> Tuple[str, str, str, Optional[str]]:
+        # Current releases are self-extracting 7z executables, not the old ZIP.
+        return GitHubReleaseResolver.resolve(
+            "skeeto/w64devkit",
+            r"w64devkit-x64-(\d+(?:\.\d+)+)\.7z\.exe",
+            r"(\d+(?:\.\d+)+)(?=\.7z\.exe)",
+            "https://github.com/skeeto/w64devkit/releases",
+        )
+
+    @classmethod
+    def resolve_fixed(cls, version: str) -> Tuple[str, str, str, Optional[str]]:
+        return GitHubReleaseResolver.resolve(
+            "skeeto/w64devkit",
+            rf"w64devkit-x64-{re.escape(version)}\.7z\.exe",
+            rf"({re.escape(version)})",
+            "https://github.com/skeeto/w64devkit/releases",
+            release_tag=f"v{version.lstrip('v')}",
+        )
+
+
+class LLVMResolver:
+    @classmethod
+    def resolve_latest(cls) -> Tuple[str, str, str, Optional[str]]:
+        return GitHubReleaseResolver.resolve(
+            "llvm/llvm-project",
+            r"clang\+llvm-(\d+(?:\.\d+)+)-x86_64-pc-windows-msvc\.tar\.xz",
+            r"(\d+(?:\.\d+)+)",
+            "https://github.com/llvm/llvm-project/releases",
+        )
+
+    @classmethod
+    def resolve_fixed(cls, version: str) -> Tuple[str, str, str, Optional[str]]:
+        version = version.lstrip("v")
+        return GitHubReleaseResolver.resolve(
+            "llvm/llvm-project",
+            rf"clang\+llvm-{re.escape(version)}-x86_64-pc-windows-msvc\.tar\.xz",
+            rf"({re.escape(version)})",
+            "https://github.com/llvm/llvm-project/releases",
+            release_tag=f"llvmorg-{version}",
+        )
+
+
+class RufusResolver:
+    @classmethod
+    def resolve_latest(cls) -> Tuple[str, str, str, Optional[str]]:
+        return GitHubReleaseResolver.resolve(
+            "pbatard/rufus",
+            r"rufus-(\d+(?:\.\d+)+)p\.exe",
+            r"(\d+(?:\.\d+)+)(?=p\.exe)",
+            "https://rufus.ie/en/",
+        )
+
+
+class VentoyResolver:
+    @classmethod
+    def resolve_latest(cls) -> Tuple[str, str, str, Optional[str]]:
+        return GitHubReleaseResolver.resolve(
+            "ventoy/Ventoy",
+            r"ventoy-(\d+(?:\.\d+)+)-windows\.zip",
+            r"(\d+(?:\.\d+)+)(?=-windows\.zip)",
+            "https://www.ventoy.net/en/download.html",
+        )
+
+
+class PowerShellResolver:
+    @classmethod
+    def resolve_latest(cls) -> Tuple[str, str, str, Optional[str]]:
+        return GitHubReleaseResolver.resolve(
+            "PowerShell/PowerShell",
+            r"PowerShell-(\d+(?:\.\d+)+)-win-x64\.zip",
+            r"(\d+(?:\.\d+)+)(?=-win-x64\.zip)",
+            "https://learn.microsoft.com/powershell/",
+        )
+
+
 def resolve_manifest(manifest: Manifest) -> Manifest:
     """
     Resolve dynamic fields for a manifest based on package type (stable vs fixed).
@@ -183,6 +322,7 @@ def resolve_manifest(manifest: Manifest) -> Manifest:
                 manifest.install.here.url = dl_url
             if manifest.install.site and not manifest.install.site.url:
                 manifest.install.site.url = site_url
+
         elif manifest.type == "fixed":
             if not manifest.version:
                 manifest.version = "24.21.0"
@@ -193,6 +333,74 @@ def resolve_manifest(manifest: Manifest) -> Manifest:
                 manifest.install.here.url = dl_url
             if manifest.install.site and not manifest.install.site.url:
                 manifest.install.site.url = site_url
+
+    source = (manifest.upstream or {}).get("source", "")
+    if source == "github_w64devkit" and manifest.type == "stable":
+        ver, dl_url, site_url, digest = W64DevKitResolver.resolve_latest()
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_w64devkit" and manifest.type == "fixed":
+        if not manifest.version:
+            raise ValueError("Un paquete fixed de w64devkit debe especificar una versión.")
+        ver, dl_url, site_url, digest = W64DevKitResolver.resolve_fixed(manifest.version)
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_llvm" and manifest.type == "stable":
+        ver, dl_url, site_url, digest = LLVMResolver.resolve_latest()
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_llvm" and manifest.type == "fixed":
+        if not manifest.version:
+            raise ValueError("Un paquete fixed de LLVM debe especificar una versión.")
+        ver, dl_url, site_url, digest = LLVMResolver.resolve_fixed(manifest.version)
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_rufus" and manifest.type == "stable":
+        ver, dl_url, site_url, digest = RufusResolver.resolve_latest()
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_ventoy" and manifest.type == "stable":
+        ver, dl_url, site_url, digest = VentoyResolver.resolve_latest()
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
+
+    elif source == "github_powershell" and manifest.type == "stable":
+        ver, dl_url, site_url, digest = PowerShellResolver.resolve_latest()
+        manifest.version = ver
+        if manifest.install.here:
+            manifest.install.here.url = dl_url
+            manifest.install.here.expected_hash = digest
+        if manifest.install.site:
+            manifest.install.site.url = site_url
 
     # Recalculate hash after resolution
     manifest.manifest_hash = manifest.calculate_hash()

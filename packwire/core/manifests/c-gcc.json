@@ -1,23 +1,26 @@
 {
   "$schema": "packwire-v1",
   "id": "c-gcc",
-  "name": "C/C++ (GCC)",
-  "aliases": ["c", "gcc", "g++", "w64devkit"],
+  "name": "C/C++ (GCC · w64devkit)",
+  "aliases": ["c", "gcc", "g++", "w64devkit", "mingw"],
   "icon": "⚙️",
-  "type": "fixed",
-  "version": "1.23.0",
+  "type": "stable",
   "category": "compilers",
-  "description": "Entorno completo y portátil de C/C++ para Windows con GCC 14, G++, GDB y GNU Make vía w64devkit.",
+  "description": "GCC, G++, GDB, GNU Make y CMake para Windows desde el release estable más reciente de w64devkit.",
+  "upstream": {
+    "source": "github_w64devkit",
+    "repository": "skeeto/w64devkit",
+    "channel": "stable"
+  },
   "install": {
     "mode": "here",
     "here": {
-      "url": "https://github.com/skeeto/w64devkit/releases/download/v1.23.0/w64devkit-1.23.0.zip",
-      "format": "zip",
+      "format": "7z-sfx",
       "binaries": ["gcc.exe", "g++.exe", "c++.exe", "cpp.exe", "as.exe", "ld.exe", "gdb.exe", "make.exe", "ar.exe", "ranlib.exe", "windres.exe"],
       "addpath": true
     },
     "site": {
-      "url": "https://github.com/skeeto/w64devkit"
+      "url": "https://github.com/skeeto/w64devkit/releases"
     },
     "clean": true
   }

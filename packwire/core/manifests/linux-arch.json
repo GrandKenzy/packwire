@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-arch",
+  "name": "Linux · Arch Linux (programación)",
+  "aliases": ["arch", "archlinux", "linux-rolling"],
+  "icon": "🏹",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Para usuarios técnicos que quieren paquetes muy recientes y control detallado del sistema; requiere instalación manual y mantenimiento continuo.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://archlinux.org/download/"
+    },
+    "clean": true
+  }
+}

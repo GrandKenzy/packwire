@@ -72,8 +72,12 @@ packwire.uninstall("python@3.13.2")
 ## 💻 Uso desde la Terminal (CLI)
 
 ```bash
-# Ver paquetes disponibles (Python, GCC, Node, Git, Docker, FFmpeg, etc.)
+# Ver paquetes disponibles (Python, GCC, MSYS2 UCRT64, Clang, MSVC, Rufus, Ventoy, PowerShell 7 y Linux)
 packwire available
+
+# Abrir el catálogo Linux desde la GUI o buscar sus opciones en CLI
+packwire ui
+packwire available | findstr /I "Linux"
 
 # Ver información de un paquete resuelto
 packwire info git
@@ -85,6 +89,15 @@ packwire install python --channel stable --mode here
 # Instalar Git o Docker
 packwire install git
 packwire install docker
+
+# Toolchains estables que siguen el upstream oficial
+packwire install gcc                 # w64devkit x64 más reciente, con SHA-256
+packwire install gcc-ucrt64          # GCC + UCRT64 de MSYS2, actualizado por pacman
+packwire install clang               # LLVM/Clang oficial más reciente
+packwire install msvc                # MSVC Build Tools estable vía winget
+packwire install rufus               # Rufus portable más reciente
+packwire install ventoy              # Ventoy para USB multiboot
+packwire install pwsh                # PowerShell 7 x64 más reciente
 
 # Instalar versión fija
 packwire install python@3.12 --mode here

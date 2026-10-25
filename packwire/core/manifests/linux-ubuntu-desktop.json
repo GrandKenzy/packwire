@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-ubuntu-desktop",
+  "name": "Linux · Ubuntu Desktop LTS (uso personal)",
+  "aliases": ["ubuntu", "ubuntu-desktop", "linux-desktop"],
+  "icon": "🟠",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Opción general para escritorio, aprendizaje y desarrollo con versiones LTS, amplio soporte de hardware y documentación.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://ubuntu.com/download/desktop"
+    },
+    "clean": true
+  }
+}

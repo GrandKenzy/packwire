@@ -1,4 +1,7 @@
+import json
+import subprocess
 import webbrowser
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 import packwire
@@ -22,7 +25,7 @@ class GuiBridge:
                 is_win11 = (winver.major == 10 and winver.build >= 22000) or winver.major > 10
             except Exception:
                 is_win11 = False
-        return {
+        result = {
             "os": SYSTEM,
             "arch": MACHINE,
             "shims_in_path": in_path,
@@ -33,6 +36,110 @@ class GuiBridge:
             "is_windows_11": is_win11,
             "is_windows": SYSTEM == "windows"
         }
+        if SYSTEM == "windows":
+            result["hardware"] = self._collect_windows_diagnostics()
+        return result
+
+    @staticmethod
+    def _collect_windows_diagnostics() -> Dict[str, Any]:
+        """Collect useful local facts without exposing personal identifiers."""
+        script = r"""
+$ErrorActionPreference = 'SilentlyContinue'
+$os = Get-CimInstance Win32_OperatingSystem
+$computer = Get-CimInstance Win32_ComputerSystem
+$cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
+$bios = Get-CimInstance Win32_BIOS | Select-Object -First 1
+$displayVersion = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').DisplayVersion
+$secureBoot = $null
+try { $secureBoot = [bool](Confirm-SecureBootUEFI) } catch { }
+$tpm = $null
+try { $tpm = Get-Tpm } catch { }
+$uptime = $null
+if ($os.LastBootUpTime) { $uptime = (Get-Date) - $os.LastBootUpTime }
+
+$gpus = @(Get-CimInstance Win32_VideoController | Where-Object { $_.Name } | ForEach-Object {
+    [pscustomobject]@{
+        name = $_.Name
+        driver = $_.DriverVersion
+        memory_gb = if ($_.AdapterRAM) { [math]::Round(([double]$_.AdapterRAM / 1GB), 1) } else { $null }
+    }
+})
+$volumes = @(Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" | Where-Object { $_.Size } | ForEach-Object {
+    [pscustomobject]@{
+        drive = $_.DeviceID
+        filesystem = $_.FileSystem
+        size_gb = [math]::Round(([double]$_.Size / 1GB), 1)
+        free_gb = [math]::Round(([double]$_.FreeSpace / 1GB), 1)
+    }
+})
+$network = @(Get-NetAdapter -Physical | Where-Object { $_.Status -eq 'Up' } | ForEach-Object {
+    [pscustomobject]@{
+        name = $_.Name
+        status = $_.Status
+        link_speed = $_.LinkSpeed
+    }
+})
+
+[pscustomobject]@{
+    os = [pscustomobject]@{
+        caption = $os.Caption
+        display_version = $displayVersion
+        version = $os.Version
+        build = $os.BuildNumber
+        architecture = $os.OSArchitecture
+    }
+    computer = [pscustomobject]@{
+        manufacturer = $computer.Manufacturer
+        model = $computer.Model
+        memory_gb = if ($computer.TotalPhysicalMemory) { [math]::Round(([double]$computer.TotalPhysicalMemory / 1GB), 1) } else { $null }
+        memory_free_gb = if ($os.FreePhysicalMemory) { [math]::Round(([double]$os.FreePhysicalMemory / 1MB), 1) } else { $null }
+        hypervisor_present = [bool]$computer.HypervisorPresent
+    }
+    cpu = [pscustomobject]@{
+        name = $cpu.Name
+        cores = $cpu.NumberOfCores
+        logical_processors = $cpu.NumberOfLogicalProcessors
+        max_clock_mhz = $cpu.MaxClockSpeed
+        virtualization_firmware = $cpu.VirtualizationFirmwareEnabled
+    }
+    firmware = [pscustomobject]@{
+        bios_vendor = $bios.Manufacturer
+        bios_version = $bios.SMBIOSBIOSVersion
+        bios_date = if ($bios.ReleaseDate) { $bios.ReleaseDate.ToString('yyyy-MM-dd') } else { $null }
+        mode = if ($secureBoot -ne $null) { 'UEFI' } else { 'No confirmado' }
+    }
+    security = [pscustomobject]@{
+        secure_boot = $secureBoot
+        tpm_present = if ($tpm) { [bool]$tpm.TpmPresent } else { $null }
+        tpm_ready = if ($tpm) { [bool]$tpm.TpmReady } else { $null }
+        tpm_spec = if ($tpm) { $tpm.SpecVersion } else { $null }
+    }
+    uptime_hours = if ($uptime) { [math]::Round($uptime.TotalHours, 1) } else { $null }
+    gpus = $gpus
+    volumes = $volumes
+    network = $network
+} | ConvertTo-Json -Depth 6 -Compress
+"""
+        try:
+            completed = subprocess.run(
+                ["powershell.exe", "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                check=False,
+            )
+            if completed.returncode != 0 or not completed.stdout.strip():
+                return {}
+            data = json.loads(completed.stdout.strip())
+            for key in ("gpus", "volumes", "network"):
+                value = data.get(key)
+                if value is None:
+                    data[key] = []
+                elif isinstance(value, dict):
+                    data[key] = [value]
+            return data
+        except (OSError, subprocess.SubprocessError, json.JSONDecodeError, TypeError, ValueError):
+            return {}
 
     def open_guide(self, guide_name: str) -> Dict[str, Any]:
         """Open a local documentation guide in user's default browser."""

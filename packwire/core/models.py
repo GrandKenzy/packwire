@@ -11,6 +11,7 @@ class HereConfig:
     binaries: List[str] = field(default_factory=lambda: ["python.exe"])
     addpath: bool = True
     silent_args: List[str] = field(default_factory=list)
+    expected_hash: Optional[str] = None
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "HereConfig":
@@ -19,7 +20,8 @@ class HereConfig:
             format=data.get("format", "zip"),
             binaries=data.get("binaries", ["python.exe"]),
             addpath=data.get("addpath", data.get("add_path", True)),
-            silent_args=data.get("silent_args", [])
+            silent_args=data.get("silent_args", []),
+            expected_hash=data.get("expected_hash") or data.get("sha256")
         )
 
 
@@ -94,6 +96,7 @@ class Manifest:
     description: str = ""
     aliases: List[str] = field(default_factory=list)
     upstream: Optional[Dict[str, Any]] = None
+    auto_update: bool = False
     install: InstallConfig = field(default_factory=InstallConfig)
     manifest_hash: Optional[str] = None
 
@@ -133,6 +136,7 @@ class Manifest:
             description=data.get("description", ""),
             aliases=data.get("aliases", []),
             upstream=data.get("upstream"),
+            auto_update=bool(data.get("auto_update", False)),
             install=InstallConfig.from_dict(install_data)
         )
         manifest.manifest_hash = manifest.calculate_hash()
@@ -148,6 +152,7 @@ class Manifest:
                 "mode": self.install.mode,
                 "clean": self.install.clean,
                 "here_url": self.install.here.url if self.install.here else None,
+                "here_hash": self.install.here.expected_hash if self.install.here else None,
                 "site_url": self.install.site.url if self.install.site else None,
                 "command_script": self.install.command.script if self.install.command else None,
                 "binaries": self.install.here.binaries if self.install.here else (self.install.command.binaries if self.install.command else []),

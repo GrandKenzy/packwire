@@ -33,9 +33,9 @@ def main(args: List[str] = None):
     install_parser.add_argument(
         "--mode",
         "-m",
-        choices=["here", "site"],
+        choices=["here", "site", "command"],
         default="here",
-        help="Modo: 'here' (descarga automática sin navegador) o 'site' (redirige a la web oficial)"
+        help="Modo: 'here' (descarga), 'command' (gestor oficial) o 'site' (web oficial)"
     )
     install_parser.add_argument(
         "--force",

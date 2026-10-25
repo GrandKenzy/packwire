@@ -86,6 +86,9 @@ class PackageState:
 | `type` | `str` | Sí | Estrategia de versión: `"stable"` (dinámica por upstream) o `"fixed"` (anclada a versión fija). |
 | `version` | `Optional[str]` | Condicional | Versión exacta (obligatoria en manifests de tipo `"fixed"`). |
 | `icon` | `str` | No | Icono emoji o URL de imagen para el dashboard visual. |
+
+Los manifests pueden usar logos oficiales remotos mediante HTTPS. Si la URL
+no responde, la interfaz usa `gui/web/default-logo.svg` como fallback local.
 | `category` | `str` | No | Agrupador funcional (`"programming languages"`, `"compilers"`, `"multimedia"`, etc.). |
 | `aliases` | `List[str]` | No | Nombres cortos alternativos para invocación en CLI (ej. `["c", "gcc", "w64devkit"]`). |
 | `install` | `InstallConfig` | Sí | Especificación de los parámetros de despliegue según el modo seleccionado. |
@@ -141,19 +144,17 @@ Esta función garantiza idempotencia matemática: cualquier modificación en la 
 ```json
 {
   "id": "c-gcc",
-  "name": "C/C++ (GCC)",
-  "type": "fixed",
-  "version": "1.23.0",
+  "name": "C/C++ (GCC · w64devkit)",
+  "type": "stable",
   "icon": "⚙️",
   "category": "compilers",
-  "description": "Entorno completo y portátil de C/C++ para Windows con GCC 14, G++, GDB y GNU Make.",
+  "description": "GCC, G++, GDB y GNU Make desde el release estable más reciente.",
   "aliases": ["c", "gcc", "g++", "w64devkit"],
   "install": {
     "mode": "here",
     "clean": true,
     "here": {
-      "url": "https://github.com/skeeto/w64devkit/releases/download/v1.23.0/w64devkit-1.23.0.zip",
-      "format": "zip",
+      "format": "7z-sfx",
       "binaries": ["gcc.exe", "g++.exe", "gdb.exe", "make.exe"],
       "addpath": true
     }

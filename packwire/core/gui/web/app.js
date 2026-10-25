@@ -268,6 +268,21 @@ function setupEventListeners() {
     btnFixPath.disabled = false;
   });
 
+  const btnRefreshSystem = document.getElementById("btn-refresh-system");
+  if (btnRefreshSystem) {
+    btnRefreshSystem.addEventListener("click", async () => {
+      btnRefreshSystem.disabled = true;
+      try {
+        await loadSystemInfo();
+        showToast("Diagnóstico del sistema actualizado.", "success");
+      } catch (err) {
+        showToast("No se pudo actualizar el diagnóstico: " + err, "error");
+      } finally {
+        btnRefreshSystem.disabled = false;
+      }
+    });
+  }
+
   // Modal close buttons
   btnModalDone.addEventListener("click", () => {
     modalOverlay.style.display = "none";
@@ -278,11 +293,7 @@ function setupEventListeners() {
     resetModalButtons();
   });
 
-  // Uninstall all buttons
-  const btnUninstallAll = document.getElementById("btn-uninstall-all");
-  if (btnUninstallAll) {
-    btnUninstallAll.addEventListener("click", startUninstallAll);
-  }
+  // There is one destructive uninstall entry point in the System tab.
   const btnUninstallAllCard = document.getElementById("btn-uninstall-all-card");
   if (btnUninstallAllCard) {
     btnUninstallAllCard.addEventListener("click", startUninstallAll);
@@ -348,6 +359,64 @@ function setupEventListeners() {
   });
 }
 
+function setSystemValue(id, value, fallback = "No disponible") {
+  const element = document.getElementById(id);
+  if (element) element.textContent = (value === null || value === undefined || value === "") ? fallback : String(value);
+}
+
+function formatGib(value) {
+  return (typeof value === "number" && Number.isFinite(value)) ? `${value.toFixed(1)} GiB` : "No disponible";
+}
+
+function renderSystemDiagnostics(hardware) {
+  const computer = hardware.computer || {};
+  const cpu = hardware.cpu || {};
+  const firmware = hardware.firmware || {};
+  const security = hardware.security || {};
+  const os = hardware.os || {};
+
+  setSystemValue("sys-device", [computer.manufacturer, computer.model].filter(Boolean).join(" · "));
+  setSystemValue("sys-memory", `${formatGib(computer.memory_gb)} · libres: ${formatGib(computer.memory_free_gb)}`);
+  setSystemValue("sys-cpu", cpu.name);
+  setSystemValue("sys-cpu-details", [
+    cpu.cores ? `${cpu.cores} núcleos` : null,
+    cpu.logical_processors ? `${cpu.logical_processors} hilos` : null,
+    cpu.max_clock_mhz ? `hasta ${cpu.max_clock_mhz} MHz` : null,
+    cpu.virtualization_firmware === true ? "virtualización firmware: sí" : (cpu.virtualization_firmware === false ? "virtualización firmware: no" : null)
+  ].filter(Boolean).join(" · "));
+
+  const gpuLines = (hardware.gpus || []).map(gpu => {
+    const details = [gpu.memory_gb ? `${gpu.memory_gb} GiB` : null, gpu.driver ? `driver ${gpu.driver}` : null].filter(Boolean).join(" · ");
+    return details ? `${gpu.name} (${details})` : gpu.name;
+  }).filter(Boolean);
+  setSystemValue("sys-gpu", gpuLines.join("\n"));
+
+  const volumeLines = (hardware.volumes || []).map(volume => {
+    const free = volume.free_gb !== undefined ? `libres ${volume.free_gb} GiB` : "espacio libre no disponible";
+    return `${volume.drive || "Volumen"}: ${volume.size_gb || "?"} GiB · ${free}${volume.filesystem ? ` · ${volume.filesystem}` : ""}`;
+  });
+  setSystemValue("sys-storage", volumeLines.join("\n"));
+
+  setSystemValue("sys-firmware", [firmware.mode, firmware.bios_vendor].filter(Boolean).join(" · "));
+  setSystemValue("sys-bios", [firmware.bios_version, firmware.bios_date].filter(Boolean).join(" · "));
+  const secureBoot = security.secure_boot === true ? "Secure Boot: activado" : (security.secure_boot === false ? "Secure Boot: desactivado" : "Secure Boot: no disponible");
+  const tpm = security.tpm_present === true ? `TPM: presente${security.tpm_spec ? ` (${security.tpm_spec})` : ""}${security.tpm_ready === true ? ", listo" : ""}` : (security.tpm_present === false ? "TPM: no detectado" : "TPM: no disponible");
+  const hypervisor = computer.hypervisor_present === true ? "Hipervisor activo" : "Hipervisor no detectado";
+  setSystemValue("sys-security", `${secureBoot} · ${tpm} · ${hypervisor}`);
+
+  if (typeof hardware.uptime_hours === "number") {
+    const days = Math.floor(hardware.uptime_hours / 24);
+    const hours = Math.round(hardware.uptime_hours % 24);
+    setSystemValue("sys-uptime", days ? `${days} d ${hours} h` : `${hours} h`);
+  } else {
+    setSystemValue("sys-uptime", null);
+  }
+  const networkLines = (hardware.network || []).map(adapter => `${adapter.name || "Adaptador"}${adapter.link_speed ? ` · ${adapter.link_speed}` : ""}`);
+  setSystemValue("sys-network", networkLines.join("\n"));
+
+  if (os.architecture) setSystemValue("sys-arch", os.architecture);
+}
+
 async function loadSystemInfo() {
   const info = await API.getSystemInfo();
   currentSystemInfo = info || {};
@@ -358,7 +427,9 @@ async function loadSystemInfo() {
   if (!info) return;
 
   const osMap = { windows: "Windows", darwin: "macOS", linux: "Linux" };
-  const osName = osMap[info.os] || info.os;
+  const hardware = info.hardware || {};
+  const hardwareOs = hardware.os || {};
+  const osName = [hardwareOs.caption || osMap[info.os] || info.os, hardwareOs.display_version].filter(Boolean).join(" ");
   platformTextEl.textContent = `${osName} (${info.arch})`;
 
   if (info.shims_in_path) {
@@ -377,10 +448,11 @@ async function loadSystemInfo() {
   document.getElementById("sys-root").textContent = info.root_dir;
   document.getElementById("sys-shims").textContent = info.shims_dir;
   document.getElementById("sys-apps").textContent = info.apps_dir;
+  renderSystemDiagnostics(hardware);
 
   const defenderCard = document.getElementById("defender-exclusion-card");
   if (defenderCard) {
-    defenderCard.style.display = (info.system === "windows") ? "block" : "none";
+    defenderCard.style.display = (info.os === "windows") ? "block" : "none";
   }
 }
 
@@ -390,11 +462,16 @@ async function refreshCatalog() {
   renderCatalog();
 }
 
+const DEFAULT_PACKAGE_ICON = "default-logo.svg";
+
 function renderIconHtml(icon) {
-  if (!icon) return '<div class="pkg-icon-container"><span class="pkg-icon-emoji">📦</span></div>';
+  if (!icon) {
+    return `<div class="pkg-icon-container"><img src="${DEFAULT_PACKAGE_ICON}" class="pkg-icon-img" alt="Packwire default icon"></div>`;
+  }
   const isUrl = icon.startsWith("http://") || icon.startsWith("https://") || icon.startsWith("data:") || icon.endsWith(".png") || icon.endsWith(".svg") || icon.endsWith(".ico");
   if (isUrl) {
-    return `<div class="pkg-icon-container"><img src="${icon}" class="pkg-icon-img" alt="icon"></div>`;
+    const safeIcon = escapeHtml(icon);
+    return `<div class="pkg-icon-container"><img src="${safeIcon}" class="pkg-icon-img" alt="package icon" onerror="this.onerror=null;this.src='${DEFAULT_PACKAGE_ICON}'"></div>`;
   }
   return `<div class="pkg-icon-container"><span class="pkg-icon-emoji">${icon}</span></div>`;
 }
@@ -417,8 +494,12 @@ function renderCatalog() {
   const query = catalogSearchQuery.trim().toLowerCase();
 
   const filtered = availablePackages.filter(pkg => {
-    // 1. Channel filter
-    if (currentFilter !== "all" && pkg.type !== currentFilter) return false;
+    // 1. Channel/catalog filter
+    if (currentFilter === "linux") {
+      if ((pkg.category || "").toLowerCase() !== "linux") return false;
+    } else if (currentFilter !== "all" && pkg.type !== currentFilter) {
+      return false;
+    }
 
     // 2. Search query filter
     if (query) {

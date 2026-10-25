@@ -69,11 +69,12 @@ class UpdaterVisitor:
                 results.append((pkg.id, False, f"No se encontró manifest para '{pkg.id}'."))
                 continue
 
-            if manifest.version == pkg.version:
+            if manifest.version == pkg.version and not manifest.auto_update:
                 results.append((pkg.id, True, f"'{pkg.id}' ya está en la versión más reciente ({pkg.version})."))
                 continue
 
-            print(f"[Packwire Updater] Actualizando '{pkg.name}': {pkg.version} -> {manifest.version}")
+            update_kind = "actualizando" if manifest.version != pkg.version else "sincronizando"
+            print(f"[Packwire Updater] {update_kind.capitalize()} '{pkg.name}': {pkg.version} -> {manifest.version}")
             old_version = pkg.version
             # Run installation of new version
             success, msg = self.installer.install(manifest, mode_override=pkg.mode, force=True)
@@ -85,7 +86,7 @@ class UpdaterVisitor:
                     old_path = Path(pkg.install_path)
                     if old_path.exists() and old_path != Path(manifest.install.here.url or ""):
                         shutil.rmtree(old_path, ignore_errors=True)
-                results.append((pkg.id, True, f"Actualizado a {manifest.version} correctamente."))
+                results.append((pkg.id, True, f"Sincronizado con el canal estable ({manifest.version})."))
             else:
                 results.append((pkg.id, False, f"Error al actualizar: {msg}"))
 

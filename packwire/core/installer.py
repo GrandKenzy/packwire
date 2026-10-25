@@ -286,7 +286,11 @@ class Installer:
 
         log(f"Iniciando descarga desde: {download_url}")
 
-        downloaded_file = self.downloader.download(download_url, force=force)
+        downloaded_file = self.downloader.download(
+            download_url,
+            expected_hash=here_cfg.expected_hash,
+            force=force,
+        )
 
         log(f"Descarga completada: {downloaded_file.name}")
 
@@ -296,13 +300,29 @@ class Installer:
 
         suffix = downloaded_file.suffix.lower()
 
+        is_7z_sfx = here_cfg.format.lower() in ("7z", "7z-sfx", "7z.exe")
         is_zip = here_cfg.format.lower() == "zip" or suffix == ".zip"
 
         is_tar = suffix in [".tar", ".gz", ".xz", ".tgz", ".bz2"] or ".tar." in downloaded_file.name.lower()
 
 
 
-        if is_zip:
+        if is_7z_sfx:
+            log(f"Extrayendo paquete 7z firmado en {target_dir.name}...")
+            try:
+                result = subprocess.run(
+                    [str(downloaded_file), "-y", f"-o{target_dir}"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if result.returncode != 0:
+                    detail = (result.stderr or result.stdout or "").strip()
+                    return False, f"Error durante la extracción 7z ({result.returncode}): {detail}"
+            except OSError as exc:
+                return False, f"No se pudo ejecutar el extractor 7z oficial: {exc}"
+
+        elif is_zip:
 
             log(f"Extrayendo paquete ZIP en {target_dir.name}...")
 
@@ -314,6 +334,7 @@ class Installer:
 
                         try:
 
+                            self._validate_archive_member(target_dir, member.filename)
                             zip_ref.extract(member, target_dir)
 
                         except (PermissionError, OSError) as item_err:
@@ -324,17 +345,17 @@ class Installer:
 
                                 log(f"[!] ALERTA ANTIVIRUS: Windows Defender / Antivirus ha bloqueado '{member.filename}'.")
 
-                                log("    Este es un falso positivo común con herramientas de desarrollo (ej. as.exe de GNU binutils/GCC).")
+                                log("    No se desactiva el antivirus automáticamente ni se recomienda excluir toda la carpeta.")
 
-                                log(f"    Solución: añade una exclusión en Windows Defender para '{PACKWIRE_ROOT}'")
+                                log("    Verifica el SHA-256 y envía el archivo al análisis de Microsoft si es un falso positivo.")
 
-                                log("    o ejecuta en terminal: packwire fix-defender")
+                                log("    La extracción se detuvo por seguridad.")
 
                                 return False, (
 
-                                    f"Instalación bloqueada por Windows Defender / Antivirus (Falso positivo en '{member.filename}'). "
+                                    f"Instalación bloqueada por Windows Defender / Antivirus en '{member.filename}'. "
 
-                                    f"Para solucionarlo, añade una exclusión para '{PACKWIRE_ROOT}' o ejecuta 'packwire fix-defender'."
+                                    "La extracción se detuvo por seguridad; no se modificaron las exclusiones del antivirus."
 
                                 )
 
@@ -348,9 +369,9 @@ class Installer:
 
                     return False, (
 
-                        f"Instalación bloqueada por Windows Defender (Falso positivo en archivo binario). "
+                        "Instalación bloqueada por Windows Defender (posible falso positivo en archivo binario). "
 
-                        f"Para solucionarlo, añade una exclusión en Windows Defender para '{PACKWIRE_ROOT}' o ejecuta 'packwire fix-defender'."
+                        "La extracción se detuvo por seguridad; verifica el SHA-256 y reporta el archivo a Microsoft."
 
                     )
 
@@ -380,7 +401,7 @@ class Installer:
 
                     log("    Para recuperarlo: abre Seguridad de Windows > Historial de Protección y haz clic en 'Restaurar'.")
 
-                    log(f"    O configura la exclusión ejecutando: packwire fix-defender")
+                    log("    Packwire no desactiva Defender: verifica el SHA-256 y revisa el Historial de protección antes de restaurar.")
 
         elif is_tar:
 
@@ -392,7 +413,11 @@ class Installer:
 
                 with tarfile.open(downloaded_file, "r:*") as tar_ref:
 
-                    tar_ref.extractall(target_dir)
+                    for member in tar_ref.getmembers():
+                        self._validate_archive_member(target_dir, member.name)
+                        if member.issym() or member.islnk():
+                            raise ValueError(f"El archivo contiene un enlace no permitido: {member.name}")
+                        tar_ref.extract(member, target_dir)
 
             except Exception as e:
 
@@ -404,11 +429,19 @@ class Installer:
 
                         f"Instalación bloqueada por Windows Defender / Antivirus. "
 
-                        f"Añade una exclusión en Windows Defender para '{PACKWIRE_ROOT}' o ejecuta 'packwire fix-defender'."
+                        "La extracción se detuvo por seguridad; no se modificaron las exclusiones del antivirus."
 
                     )
 
                 return False, f"Error durante la extracción TAR: {e}"
+
+        elif here_cfg.format.lower() in ("portable-exe", "portable"):
+
+            log("Copiando aplicación portable...")
+
+            binary_name = here_cfg.binaries[0] if here_cfg.binaries else downloaded_file.name
+            portable_path = target_dir / binary_name
+            shutil.copy2(downloaded_file, portable_path)
 
         elif suffix in [".exe", ".msi"]:
 
@@ -863,7 +896,16 @@ try {{
 
 
     @staticmethod
+    def _validate_archive_member(target_dir: Path, member_name: str):
+        """Reject archive entries that would escape the installation folder."""
+        root = target_dir.resolve()
+        destination = (target_dir / member_name).resolve()
+        try:
+            destination.relative_to(root)
+        except ValueError as exc:
+            raise ValueError(f"Entrada de archivo fuera del destino: {member_name}") from exc
 
+    @staticmethod
     def _patch_python_embed_pth(target_dir: Path):
 
         """

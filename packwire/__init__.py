@@ -19,7 +19,7 @@ from packwire.core.visitors.updater import UpdaterVisitor
 from packwire.core.installer import Installer
 from packwire.core.resolver import resolve_manifest
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 _downloader = DownloaderVisitor()
 _pather = PatherVisitor()

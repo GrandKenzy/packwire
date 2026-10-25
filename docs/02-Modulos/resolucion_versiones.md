@@ -22,6 +22,10 @@ class NodeResolver:
     @staticmethod
     def resolve_latest_lts() -> Tuple[str, str, str]: ...
 
+class GitHubReleaseResolver:
+    @staticmethod
+    def resolve(...) -> Tuple[str, str, str, Optional[str]]: ...
+
 def resolve_manifest(manifest: Manifest) -> Manifest: ...
 ```
 
@@ -55,6 +59,25 @@ Consulta el índice de versiones oficial de la Fundación OpenJS:
   ```
   https://nodejs.org/dist/{version}/node-{version}-win-x64.zip
   ```
+
+---
+
+### 3. Toolchains y utilidades de GitHub (`w64devkit`, LLVM, Rufus, Ventoy y PowerShell)
+
+`GitHubReleaseResolver` consulta únicamente releases oficiales que no sean
+draft ni prerelease, filtra el asset x64 esperado y conserva el digest SHA-256
+publicado por GitHub. Así `c-gcc` sigue el release estable de
+[`skeeto/w64devkit`](https://github.com/skeeto/w64devkit/releases) y
+`c-clang` el asset Windows x64 de
+[`llvm/llvm-project`](https://github.com/llvm/llvm-project/releases), sin
+dejar una URL o versión fija en el manifest.
+
+El mismo mecanismo mantiene `rufus`, `ventoy` y `powershell7` en su release
+estable más reciente, seleccionando respectivamente el ejecutable portable de
+Rufus, el ZIP Windows de Ventoy y el ZIP Windows x64 de PowerShell.
+
+El instalador verifica ese digest antes de extraer. Para `w64devkit` se usa el
+SFX 7z oficial actual; para LLVM se usa el archivo `tar.xz` oficial.
 
 ---
 
