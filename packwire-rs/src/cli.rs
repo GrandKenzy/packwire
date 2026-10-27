@@ -356,7 +356,7 @@ mod tests {
         let paths = test_paths();
         let context = CliContext::with_paths(paths.clone()).unwrap();
         assert!(context.loader.list_available_manifests().len() >= 44);
-        fs::remove_dir_all(paths.packwire_root).unwrap();
+        let _ = fs::remove_dir_all(paths.packwire_root);
     }
 
     #[test]
