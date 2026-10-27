@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "make",
+  "name": "GNU Make",
+  "aliases": ["make", "gmake", "build tool"],
+  "icon": "🛠️",
+  "type": "stable",
+  "category": "tools",
+  "description": "Automatización clásica de compilación mediante Makefiles.",
+  "upstream": {"source": "winget", "id": "GnuWin32.Make"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar GNU Make.' }; winget install --id GnuWin32.Make -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["make.exe"]
+    },
+    "site": {"url": "https://gnuwin32.sourceforge.net/packages/make.htm"},
+    "clean": true
+  }
+}

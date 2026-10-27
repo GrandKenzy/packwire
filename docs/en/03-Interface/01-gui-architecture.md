@@ -1,26 +1,14 @@
 # GUI Architecture
 
-Packwire's graphical frontend is built as a lightweight Single-Page Application (SPA) using HTML5, CSS3, and modern Vanilla JavaScript, embedded via `pywebview`.
+Packwire's GUI is implemented in Rust in `packwire-rs/src/gui.rs`. The frontend is a HTML/CSS/JavaScript SPA stored in `assets/web/` and rendered through `wry`/WebView2 on Windows or the system WebKit engine on Linux and macOS.
 
----
+## Executables
 
-## 1. Window Lifecycle & Launch Modes
+- `packwire.exe`: console CLI.
+- `packwirew.exe`: windowed GUI without a console.
 
-### Desktop Window Mode (`packwire ui`)
-- Creates a dedicated native window using Edge WebView2 (Windows), WebKitGTK (Linux), or Safari WebKit (macOS).
-- On Windows, launching via `packwirew.exe` completely suppresses the background terminal console window.
-- Injects a JavaScript API bridge object (`window.pywebview.api`) that exposes Python methods directly to frontend scripts.
+The backend starts a local HTTP server on `127.0.0.1:5050`, serves `assets/web/`, and exposes Packwire operations as JSON endpoints. The native GUI loads the same address inside the system WebView.
 
-### Fallback Web Server Mode (`packwire ui --web`)
-- Starts a local HTTP daemon on `http://localhost:5050` using Python's standard `http.server` or `bottle`.
-- Automatically opens the default web browser.
-- Exposes REST endpoints under `/api/<method_name>` that mirror the native IPC bridge.
+If the default port is occupied, the backend selects another available port. `PACKWIRE_WEB_DIR` can point to an alternative web-resource directory during development or packaging.
 
----
-
-## 2. Frontend Structure (`packwire/core/gui/web/`)
-
-- `index.html`: Main SPA layout containing Catalog, Installed Packages, and System Diagnostics tabs.
-- `app.js`: Application controller, search filters, modal management, and live terminal streaming.
-- `structure.css`: Shared layout, navigation bar, typography, and modal dialog rules.
-- `global/`: Modular theme styles (`default_*` for light mode, `dark_*` for dark mode).
+The application does not use Electron, Python, PyInstaller, or an external web server.

@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "msys2",
+  "name": "MSYS2",
+  "aliases": ["msys2", "msys"],
+  "icon": "🛠️",
+  "type": "stable",
+  "category": "tools",
+  "version": "latest",
+  "description": "Entorno tipo Unix nativo para Windows con el instalador estable de MSYS2 y gestor Pacman.",
+  "auto_update": true,
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; usa packwire install msys2 --mode site para abrir el instalador oficial.' } else { winget install --id MSYS2.MSYS2 -e --source winget --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -ne 0) { winget upgrade --id MSYS2.MSYS2 -e --source winget --accept-source-agreements --accept-package-agreements } }",
+      "binaries": [],
+      "elevated": false
+    },
+    "site": {
+      "url": "https://www.msys2.org/"
+    },
+    "clean": true
+  }
+}

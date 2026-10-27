@@ -1,6 +1,6 @@
 # 01. Arquitectura del Sistema
 
-> **Versión Actual:** `0.1.4`
+> **Versión Actual:** `1.0.0`
 > **Plataformas:** Windows (Win32), Linux (POSIX), macOS (Darwin)
 
 Esta sección expone los fundamentos estructurales, directrices de diseño y patrones de ingeniería que rigen la operación interna de Packwire. El sistema ha sido concebido bajo principios de modularidad estricta, determinismo en el estado del entorno de ejecución e idempotencia en las operaciones sobre el sistema de archivos anfitrión.

@@ -1,6 +1,6 @@
 # 01. System Architecture
 
-> **Current Version:** `0.1.4`
+> **Current Version:** `1.0.0`
 > **Platforms:** Windows (Win32), Linux (POSIX), macOS (Darwin)
 
 This section outlines the architectural foundations, design principles, and engineering patterns governing Packwire's internal operation. The system is designed around strict modularity, deterministic execution environments, and idempotent operations on the host filesystem without requiring superuser privileges for everyday package management.

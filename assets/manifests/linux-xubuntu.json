@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-xubuntu",
+  "name": "Linux · Xubuntu (PC modesto)",
+  "aliases": ["xubuntu", "linux-xubuntu", "ubuntu-xfce"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Escritorio Xfce configurable y de consumo moderado para uso diario en hardware limitado.",
+  "install": {"mode": "site", "site": {"url": "https://xubuntu.org/download/"}, "clean": true}
+}

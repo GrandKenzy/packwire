@@ -1,209 +1,27 @@
-# Manual de la Interfaz de Línea de Comandos (CLI)
+# Interfaz de Línea de Comandos
 
-La interfaz de línea de comandos de Packwire constituye el punto de acceso primordial para entornos automatizados, scripts de despliegue continuo (CI/CD) y administradores de sistemas. Se implementa en [`packwire/cli.py`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/cli.py) y puede ser invocada de manera equivalente como:
+La CLI nativa está implementada en `packwire-rs/src/cli.rs` y se compila como `packwire.exe`.
 
-```bash
-packwire <comando> [opciones]
-# o mediante el módulo de Python:
-python -m packwire <comando> [opciones]
-```
+## Comandos
 
----
-
-## ⚙️ Estructura Global y Subcomandos
-
-```
-packwire [-h] {install,remove,reinstall,update,list,available,info,path,ui,setup,build} ...
-```
-
-### Códigos de Salida del Proceso (`Exit Codes`)
-
-* `0`: Operación completada con éxito.
-* `1`: Fallo durante la ejecución (error de sintaxis, paquete inexistente, discrepancia de suma de verificación o error de permisos).
-
----
-
-## 🔍 Catálogo Exhaustivo de Comandos
-
-### 1. `install`
-Instala un paquete en el sistema resolviendo dependencias y compilando sus shims correspondientes.
-
-```bash
-packwire install <package> [--version <ver>] [--channel {stable,fixed}] [--mode {here,site,command}] [--force]
-```
-
-| Argumento / Bandera | Tipo | Requerido | Descripción |
-| :--- | :--- | :--- | :--- |
-| `package` | Posicional | Sí | Nombre, alias o identificador semántico del paquete (ej. `python`, `git`, `docker`, `c`, `ffmpeg`, `chocolatey`). |
-| `--version`, `-v` | Opción | No | Fuerza una versión exacta específica (ej. `-v 3.12.8`). |
-| `--channel` | Opción | No | Canal de distribución: `stable` (predeterminado) o `fixed`. Los toolchains nuevos usan `stable`. |
-| `--mode`, `-m` | Opción | No | Modo de despliegue: `here` (automático desatendido), `site` (sitio oficial) o `command` (script de consola con elevación). |
-| `--force`, `-f` | Bandera | No | Ignora colisiones preexistentes y fuerza la sobrescritura física de binarios y shims. |
-
-```bash
-# Ejemplos:
-packwire install python
-packwire install git
-packwire install docker
-packwire install python@3.13 --mode here
-packwire install c --force
-```
-
----
-
-### 2. `remove` (Alias: `uninstall`)
-Desinstala un paquete individual o purga la totalidad del entorno Packwire.
-
-```bash
-packwire remove [<package>] [--all] [--keep-path]
-```
-
-| Argumento / Bandera | Tipo | Requerido | Descripción |
-| :--- | :--- | :--- | :--- |
-| `package` | Posicional | Condicional | Identificador del paquete a remover (ej. `python@stable`, `git`). Obligatorio salvo si se usa `--all`. |
-| `--all` | Bandera | No | Purga absoluta: remueve todas las aplicaciones, shims, registros de estado, caché y variable PATH. |
-| `--keep-path` | Bandera | No | Utilizada junto con `--all` para evitar eliminar la entrada de shims del registro `PATH` o perfiles de shell. |
-
-```bash
-# Ejemplos:
-packwire remove python@stable
-packwire remove git
-packwire remove --all
-```
-
----
-
-### 3. `reinstall`
-Ejecuta una reinstalación limpia forzada de un paquete previamente registrado.
-
-```bash
-packwire reinstall <package>
-```
-
-```bash
-# Ejemplo:
-packwire reinstall c-gcc
-packwire reinstall git
-```
-
----
-
-### 4. `update`
-Comprueba y aplica actualizaciones para paquetes configurados bajo el canal dinámico `stable`.
-
-```bash
-packwire update [<package>]
-```
-
-| Argumento / Bandera | Tipo | Requerido | Descripción |
-| :--- | :--- | :--- | :--- |
-| `package` | Posicional | No | Identificador del paquete a actualizar. Si se omite, analiza y actualiza todos los paquetes instalados. |
-
-```bash
-# Ejemplos:
-packwire update
-packwire update python@stable
-packwire update docker
-```
-
----
-
-### 5. `list`
-Genera una tabla formateada en consola con todos los paquetes registrados en `state.json`.
-
-```bash
-packwire list
-```
-
-**Formato de salida:**
 ```text
-ID                   NOMBRE       VERSIÓN    TIPO     MODO     RUTA
---------------------------------------------------------------------------------
-python@stable        Python       3.14.0     stable   here     C:\...\apps\python@stable
-git                  Git          latest     stable   command  C:\Program Files\Git
-docker               Docker       latest     stable   command  C:\Program Files\Docker
-c-gcc                C/C++ (GCC)  latest    stable   here     C:\...\apps\c-gcc
-```
-
----
-
-### 6. `available`
-Imprime la lista de todos los manifiestos disponibles en el catálogo interno de Packwire (incluyendo Python, Node.js, Git, Docker, GCC, MSYS2 UCRT64, Clang, MSVC, Rufus, Ventoy, PowerShell 7 y otros).
-
-```bash
+packwire install <paquete> [--version <versión>] [--channel stable|fixed] [--mode here|site|command] [--force]
+packwire list
 packwire available
-```
-
----
-
-### 7. `info`
-Inspecciona y proyecta el manifiesto normalizado de un paquete en formato JSON estructurado.
-
-```bash
-packwire info <package>
-```
-
-```bash
-# Ejemplo:
-packwire info docker
-packwire info git
-packwire info ffmpeg
-```
-
----
-
-### 8. `path`
-Verifica o configura el directorio de shims dentro de la variable de entorno `PATH` del usuario actual.
-
-```bash
+packwire info <paquete>
 packwire path [--add]
+packwire --help
+packwire --version
 ```
 
-| Bandera | Descripción |
-| :--- | :--- |
-| *(sin banderas)* | Muestra la ruta física del directorio de shims y comprueba si ya está presente en la sesión activa o en el perfil persistente del usuario. |
-| `--add` | Inyecta la ruta de shims: en Windows actualiza `HKCU\Environment\Path` y emite `WM_SETTINGCHANGE`; en Linux y macOS anexa la directiva `export PATH` en `~/.zshrc`, `~/.bashrc` y `~/.profile`. |
+Ejemplos:
 
----
-
-### 9. `ui` (Alias: `gui`)
-Inicia el panel de control gráfico moderno de Packwire.
-
-```bash
-packwire ui [--web] [--port <puerto>]
+```text
+packwire available
+packwire install python@stable --mode here
+packwire install rust --channel stable
+packwire list
+packwire path --add
 ```
 
-| Bandera | Tipo | Valor por Defecto | Descripción |
-| :--- | :--- | :--- | :--- |
-| `--web` | Bandera | `False` | Fuerza la ejecución en servidor HTTP local abriendo la interfaz en el navegador predeterminado. |
-| `--port` | Opción | `5050` | Puerto TCP de enlace para el servidor web. |
-
----
-
-### 10. `setup` (Alias: `self-install`)
-Instala e integra Packwire en el sistema operativo anfitrión (shims maestros, `PATH` y accesos directos).
-
-```bash
-packwire setup [--desktop] [--no-start-menu] [--no-path]
-```
-
-| Bandera | Descripción |
-| :--- | :--- |
-| `--desktop` | Genera un acceso directo de la interfaz gráfica en el Escritorio del usuario (`.lnk` en Windows, `.desktop` en Linux, `.command` en macOS). |
-| `--no-start-menu` | Omite la creación del icono en el Menú Inicio (Windows) o en `~/.local/share/applications/` (Linux). |
-| `--no-path` | Omite la inyección del directorio de shims en la variable de entorno `PATH` del sistema. |
-
----
-
-### 11. `build` (Alias: `pack`)
-Compila y genera los artefactos de distribución del proyecto.
-
-```bash
-packwire build [--exe] [--wheel] [--all]
-```
-
-| Bandera | Descripción |
-| :--- | :--- |
-| `--exe` | Compila el binario ejecutable independiente `dist/packwire.exe` con PyInstaller. |
-| `--wheel` | Construye el paquete de distribución universal Python (`.whl` y `.tar.gz`) en `dist/`. |
-| `--all` | Compila secuencialmente tanto el ejecutable nativo como los paquetes wheel. |
+La GUI se ejecuta con el binario separado `packwirew.exe`, que no crea una ventana de consola.

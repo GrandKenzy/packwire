@@ -2,6 +2,15 @@
 
 Todos los cambios importantes de Packwire se documentan aquí.
 
+## [1.0.0] - 2026-10-27
+
+### Estable
+
+- Primera versión estable de Packwire con CLI y GUI nativas en Rust.
+- Distribución oficial para Windows mediante binarios portables e instalador Inno Setup.
+- Catálogo ampliado de herramientas, lenguajes, runtimes, sistemas operativos y aplicaciones.
+- Eliminada por completo la implementación Python y su cadena de empaquetado heredada.
+
 ## [0.1.4] - 2026-10-24
 
 ### Añadido

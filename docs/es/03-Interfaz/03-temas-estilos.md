@@ -1,6 +1,6 @@
 # Sistema Modular de Estilos y Temas Visuales
 
-El subsistema de estilos de Packwire organiza la capa visual mediante una arquitectura modular en CSS3 sin preprocesadores pesados. Reside en [`packwire/core/gui/web/`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/gui/web) y se estructura a través del directorio [`global/`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/packwire/core/gui/web/global), separando estrictamente la estructura espacial de las paletas cromáticas.
+El subsistema de estilos de Packwire organiza la capa visual mediante una arquitectura modular en CSS3 sin preprocesadores pesados. Reside en [`assets/web/`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/assets/web) y se estructura a través del directorio [`global/`](file:///c:/Users/Kentucky/Desktop/PROYECTOS%20_%20PYTHON/packwire/assets/web/global), separando estrictamente la estructura espacial de las paletas cromáticas.
 
 Esta separación permite conmutar en caliente entre temas (Claro y Oscuro) en tiempo real, manteniendo la persistencia en `configs.json` para que la elección visual del usuario se conserve intacta entre ejecuciones.
 
@@ -9,7 +9,7 @@ Esta separación permite conmutar en caliente entre temas (Claro y Oscuro) en ti
 ## ⚙️ Estructura de Archivos de Estilo
 
 ```
-packwire/core/gui/web/
+assets/web/
 ├── global.css                 <-- Entrypoint global y variables raíz
 ├── styles.css                 <-- Reglas generales del dashboard y animaciones
 └── global/
@@ -67,21 +67,17 @@ Define la disposición espacial que permanece constante con independencia del te
 El cambio de tema se procesa en el cliente mediante JavaScript y se sincroniza con el backend:
 
 ```javascript
-// packwire/core/gui/web/app.js
+// assets/web/app.js
 async function cambiarTema(nuevoTema) {
     document.body.classList.remove('theme-default', 'theme-dark');
     document.body.classList.add(`theme-${nuevoTema}`);
     
     // Persistir preferencia en configs.json a través de GuiBridge
-    if (window.pywebview && window.pywebview.api) {
-        await window.pywebview.api.set_config('theme', nuevoTema);
-    } else {
-        await fetch('/api/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ key: 'theme', value: nuevoTema })
-        });
-    }
+    await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'theme', value: nuevoTema })
+    });
 }
 ```
 
@@ -91,7 +87,7 @@ Al inicializar la interfaz, `app.js` consulta `get_config('theme')`. Si existe u
 
 ## ⚠️ Consideraciones Críticas y Casos de Borde
 
-1. **Resolución en Modo Compilado (`_MEIPASS`):** Al distribuir Packwire como ejecutable único (`packwire.exe`), los archivos CSS son extraídos en la carpeta temporal de PyInstaller. `bridge.py` y `server.py` resuelven la ruta absoluta mediante `get_web_dir()` y `get_global_css_dir()`, asegurando que todas las hojas de estilo modulares se sirvan correctamente sin errores 404.
+1. **Resolución en modo distribuido:** `gui.rs` sirve los archivos desde la carpeta `web` junto al ejecutable o desde `PACKWIRE_WEB_DIR` durante desarrollo, asegurando que las hojas de estilo no produzcan errores 404.
 2. **Iconografía Sobria y Libre de Emojis en Botones:** En conformidad con el diseño moderno, los botones de acción utilizan etiquetas de texto claras (`Instalar`, `Reinstalar`, `Desinstalar`, `Actualizar`) con iconos tipográficos técnicos o SVG limpios, eliminando el uso de emojis informales en los controles de interacción.
 
 ---
@@ -99,7 +95,7 @@ Al inicializar la interfaz, `app.js` consulta `get_config('theme')`. Si existe u
 ## 💡 Ejemplo de Declaración CSS en Tema Oscuro
 
 ```css
-/* packwire/core/gui/web/global/dark_cards.css */
+/* assets/web/global/dark_cards.css */
 body.theme-dark .package-card {
     background: #1E293B;
     border: 1px solid #334155;

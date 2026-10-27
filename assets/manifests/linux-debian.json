@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-debian",
+  "name": "Linux · Debian Stable (servidores)",
+  "aliases": ["linux-debian", "debian", "debian-server"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Opción conservadora para servidores y sistemas administrados; Debian publica medios oficiales firmados y verificables.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://www.debian.org/CD/"
+    },
+    "clean": true
+  }
+}

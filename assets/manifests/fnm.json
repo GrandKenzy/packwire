@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "fnm",
+  "name": "fnm",
+  "aliases": ["fnm", "node version manager", "node versions"],
+  "icon": "🔁",
+  "type": "stable",
+  "category": "package managers",
+  "description": "Gestor rápido de versiones de Node.js para proyectos JavaScript.",
+  "upstream": {"source": "winget", "id": "Schniz.fnm"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar fnm.' }; winget install --id Schniz.fnm -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["fnm.exe"]
+    },
+    "site": {"url": "https://github.com/Schniz/fnm"},
+    "clean": true
+  }
+}

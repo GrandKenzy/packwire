@@ -1,17 +1,42 @@
 # System Integration
 
-The `packwire.installer_self` module manages local system integration, shortcut creation, and environment variable configuration.
+Packwire is distributed as a native Rust application. System integration is handled by the Inno Setup installer and the native PATH/shim implementation; Python and helper installation scripts are not required.
 
----
+## Windows
 
-## 1. What `packwire setup` Does
+`Packwire-Setup.exe` installs:
 
-Running `packwire setup` performs the following automated steps:
-1. Ensures all required directories exist (`%APPDATA%\packwire\shims`, `apps`, `cache`, `manifests`).
-2. Generates root CLI launcher shims:
-   - `packwire.cmd` and `packwire.ps1` on Windows.
-   - Executable shell scripts on Linux and macOS.
-3. Adds the shims directory to the User PATH in the Windows Registry (`HKCU\Environment`) and broadcasts `WM_SETTINGCHANGE`.
-4. Creates Windows shell shortcuts (`.lnk`) using PowerShell `WScript.Shell`:
-   - Start Menu: `Packwire`, `Packwire CLI (Console)`.
-   - Desktop (optional with `--desktop`).
+- `packwire.exe`, the native CLI.
+- `packwirew.exe`, the windowed GUI.
+- `web/`, the dashboard resources.
+- `manifests/`, the package catalog.
+- Start Menu and optional Desktop shortcuts using the Packwire icon.
+- The application directory in the user PATH when selected.
+
+The default destination is `%LOCALAPPDATA%\Programs\Packwire`, so standard installation does not require administrator privileges.
+
+## PATH and shims
+
+Managed-package shims are stored at:
+
+```text
+%APPDATA%\packwire\shims       # Windows
+~/.local/share/packwire/shims   # Linux and macOS
+```
+
+Use the native CLI to inspect or add the shim directory:
+
+```text
+packwire path
+packwire path --add
+```
+
+On Windows, user PATH updates use `HKCU\Environment` and broadcast `WM_SETTINGCHANGE`.
+
+## Local builds
+
+```powershell
+cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
+```
+
+Compile `installer.iss` with Inno Setup after building the binaries.

@@ -5,11 +5,14 @@
 ; =====================================================================
 
 #define MyAppName "Packwire"
-#define MyAppVersion "0.1.4"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "Packwire Team"
 #define MyAppURL "https://github.com/GrandKenzy/packwire"
 #define MyAppExeName "packwire.exe"
 #define MyAppGuiExeName "packwirew.exe"
+#ifndef BuildDir
+#define BuildDir "packwire-rs\target\release"
+#endif
 
 [Setup]
 AppId={{E58C3729-28BC-4375-9C4B-0BE9FD162121}
@@ -24,7 +27,7 @@ DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 OutputDir=dist
 OutputBaseFilename=Packwire-Setup
-SetupIconFile=packwire\core\gui\web\logo.ico
+SetupIconFile=assets\web\front.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
@@ -42,23 +45,21 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "addtopath"; Description: "Añadir Packwire a la variable de entorno PATH del usuario"; GroupDescription: "Configuración del Sistema:"; Flags: unchecked
 
 [Files]
-Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\{#MyAppGuiExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "packwire\core\gui\web\logo.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#BuildDir}\{#MyAppGuiExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "assets\web\*"; DestDir: "{app}\web"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "assets\manifests\*.json"; DestDir: "{app}\manifests"; Flags: ignoreversion
+Source: "assets\web\front.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; Parameters: ""; IconFilename: "{app}\logo.ico"; Comment: "Packwire Package Manager"
-Name: "{group}\Packwire CLI (Consola)"; Filename: "{cmd}"; Parameters: "/k ""{app}\{#MyAppExeName}"" --help"; IconFilename: "{app}\logo.ico"
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; IconFilename: "{app}\front.ico"; Comment: "Packwire"
+Name: "{group}\Packwire CLI"; Filename: "{cmd}"; Parameters: "/k ""{app}\{#MyAppExeName}"" --help"; IconFilename: "{app}\front.ico"; Comment: "Packwire CLI"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; Parameters: ""; IconFilename: "{app}\logo.ico"; Tasks: desktopicon
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppGuiExeName}"; IconFilename: "{app}\front.ico"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "setup --no-start-menu"; StatusMsg: "Configurando shims y entorno de Packwire..."; Flags: runhidden
-Filename: "{app}\{#MyAppGuiExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
-
-[UninstallRun]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "uninstall --all"; RunOnceId: "PackwireCleanAll"; Flags: runhidden
+Filename: "{app}\{#MyAppGuiExeName}"; Description: "{cm:LaunchProgram,{#MyAppName}}"; Flags: nowait postinstall skipifsilent
 
 [Code]
 // Gestión de PATH en Inno Setup

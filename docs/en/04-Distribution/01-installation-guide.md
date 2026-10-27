@@ -1,40 +1,47 @@
 # Full Installation Guide
 
-Packwire can be installed on Windows, Linux, and macOS using precompiled binaries, automated repository scripts, or standard Python packaging.
+Packwire is a native Rust application for Windows, Linux, and macOS. End users should use the official release artifacts; developers can build the binaries with Cargo.
 
----
+## Official releases
 
-## 1. Option A: Precompiled Standalone Binaries (Recommended)
+Download the latest release from [GitHub Releases](https://github.com/GrandKenzy/packwire/releases/latest):
 
-No Python runtime installation is required:
-1. Navigate to the official releases page: `https://github.com/GrandKenzy/packwire/releases/latest`.
-2. **Windows:** Download `Packwire-Setup.exe` (full wizard) or `packwire.exe` (portable).
-3. **Linux:** Download `packwire-linux-x64.tar.gz`, extract, and move the binary to `~/.local/bin/`.
-4. **macOS:** Download `packwire-macos-universal.tar.gz`, extract, and move to `/usr/local/bin/`.
+- Windows: `Packwire-Setup.exe` or `packwire-windows-x64.zip`.
+- Linux: `packwire-linux-x64.tar.gz`.
+- macOS: `packwire-macos-universal.tar.gz`.
 
----
+The Windows installer creates the shortcuts, configures the optional PATH entry, and registers the uninstaller.
 
-## 2. Option B: Automated Scripts (From Repository)
+## Build from source
 
-### On Windows
-Run `install.bat` via double-click in File Explorer, or via PowerShell:
+Install stable Rust and run:
+
 ```powershell
-.\install.ps1 -DesktopShortcut
+cargo test --manifest-path packwire-rs/Cargo.toml
+cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 ```
 
-### On Linux & macOS
-Run the POSIX installer script:
-```bash
-chmod +x install.sh
-./install.sh --desktop
-source ~/.bashrc  # or source ~/.zshrc on macOS
+The catalog and dashboard resources are read from `assets/manifests/` and `assets/web/`.
+
+## Verify the installation
+
+```text
+packwire --help
+packwire available
+packwire path
+packwirew.exe
 ```
 
----
+To install a package:
 
-## 3. Option C: Python Package (`pip`)
-
-```bash
-pip install packwire
-packwire setup --desktop
+```text
+packwire install python@stable --mode here
 ```
+
+To remove a managed package:
+
+```text
+packwire list
+```
+
+Use the Applications section in the GUI for managed-package removal.

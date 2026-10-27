@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-antix",
+  "name": "Linux · antiX (PCs viejas)",
+  "aliases": ["linux-antix", "antix", "linux-old-pc"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Recomendación ligera para PCs antiguas: antiX ofrece imágenes de 64 y 32 bits y está basado en Debian Stable.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://antixlinux.com/download/"
+    },
+    "clean": true
+  }
+}

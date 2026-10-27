@@ -1,0 +1,24 @@
+{
+  "$schema": "packwire-v1",
+  "id": "c-clang-msys2-clang64",
+  "name": "C/C++ (Clang · MSYS2 CLANG64)",
+  "aliases": ["clang-msys2", "clang64", "msys2-clang64"],
+  "icon": "⚙️",
+  "type": "stable",
+  "version": "latest",
+  "category": "compilers",
+  "description": "LLVM/Clang, LLD y libc++ para Windows mediante el entorno MSYS2 CLANG64, actualizado con pacman.",
+  "auto_update": true,
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "$ErrorActionPreference='Stop'; $bash='C:\\msys64\\usr\\bin\\bash.exe'; if (-not (Test-Path $bash)) { if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'Se necesita winget para instalar MSYS2 de forma verificada.' }; winget install --id MSYS2.MSYS2 -e --source winget --accept-source-agreements --accept-package-agreements }; if (-not (Test-Path $bash)) { throw 'MSYS2 no quedó instalado en C:\\msys64.' }; & $bash -lc 'pacman -Sy --noconfirm; pacman -Syu --noconfirm; pacman -S --needed --noconfirm mingw-w64-clang-x86_64-toolchain'; if ($LASTEXITCODE -ne 0) { throw 'pacman no pudo instalar el toolchain CLANG64.' }; $bin='C:\\msys64\\clang64\\bin'; $userPath=[Environment]::GetEnvironmentVariable('Path','User'); if ($userPath -notlike ('*'+$bin+'*')) { [Environment]::SetEnvironmentVariable('Path', (($userPath.TrimEnd(';')+';'+$bin).Trim(';')), 'User') }",
+      "binaries": [],
+      "elevated": false
+    },
+    "site": {
+      "url": "https://www.msys2.org/docs/environments/"
+    },
+    "clean": true
+  }
+}

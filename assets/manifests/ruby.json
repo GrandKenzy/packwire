@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "ruby",
+  "name": "Ruby",
+  "aliases": ["ruby", "gem", "rubyinstaller"],
+  "icon": "💎",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje dinámico para scripting, automatización y desarrollo web.",
+  "upstream": {"source": "winget", "id": "RubyInstallerTeam.RubyWithDevKit.3.4"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar Ruby.' }; winget install --id RubyInstallerTeam.RubyWithDevKit.3.4 -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["ruby.exe", "gem.cmd"]
+    },
+    "site": {"url": "https://rubyinstaller.org/downloads/"},
+    "clean": true
+  }
+}

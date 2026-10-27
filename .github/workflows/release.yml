@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag de la versión a publicar (ej. v0.1.0)'
+        description: 'Tag de la versión a publicar (ej. v1.0.0)'
         required: false
-        default: 'v0.1.0'
+        default: 'v1.0.0'
 
 permissions:
   contents: write
@@ -26,26 +26,31 @@ jobs:
       - name: Checkout Código Fuente
         uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Instalar Dependencias y PyInstaller
+      - name: Compilar binarios Rust de Windows
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install pyinstaller wheel
+          cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 
-      - name: Compilar packwire.exe con PyInstaller
+      - name: Preparar binarios Windows
+        shell: pwsh
         run: |
-          python -m packwire build --exe
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item packwire-rs/target/release/packwire.exe dist/packwire.exe -Force
+          Copy-Item packwire-rs/target/release/packwirew.exe dist/packwirew.exe -Force
 
       - name: Empaquetar ZIP Portable de Windows
         shell: pwsh
         run: |
-          Compress-Archive -Path dist\packwire.exe, dist\packwirew.exe -DestinationPath dist\packwire-windows-x64.zip -Force
+          $bundle = "dist\packwire-windows-x64"
+          New-Item -ItemType Directory -Force -Path "$bundle\web" | Out-Null
+          Copy-Item dist\packwire.exe "$bundle\packwire.exe" -Force
+          Copy-Item dist\packwirew.exe "$bundle\packwirew.exe" -Force
+          Copy-Item assets\web\* "$bundle\web" -Recurse -Force
+          New-Item -ItemType Directory -Force -Path "$bundle\manifests" | Out-Null
+          Copy-Item assets\manifests\*.json "$bundle\manifests" -Force
+          Compress-Archive -Path "$bundle\*" -DestinationPath dist\packwire-windows-x64.zip -Force
 
       - name: Instalar Inno Setup
         shell: pwsh
@@ -91,28 +96,23 @@ jobs:
       - name: Checkout Código Fuente
         uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Instalar Dependencias del Sistema y PyInstaller
+      - name: Compilar binarios Rust de Linux
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential patchelf
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install pyinstaller wheel
-
-      - name: Compilar binario nativo de Linux
-        run: |
-          python -m packwire build --exe
+          cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 
       - name: Empaquetar tar.gz de Linux
         run: |
-          chmod +x dist/packwire
-          tar -czvf dist/packwire-linux-x64.tar.gz -C dist packwire
+          mkdir -p dist/packwire-linux-x64/web
+          cp packwire-rs/target/release/packwire dist/packwire-linux-x64/packwire
+          cp packwire-rs/target/release/packwirew dist/packwire-linux-x64/packwirew
+          cp -R assets/web/. dist/packwire-linux-x64/web/
+          mkdir -p dist/packwire-linux-x64/manifests
+          cp assets/manifests/*.json dist/packwire-linux-x64/manifests/
+          chmod +x dist/packwire-linux-x64/packwire dist/packwire-linux-x64/packwirew
+          tar -czvf dist/packwire-linux-x64.tar.gz -C dist packwire-linux-x64
 
       - name: Subir Artefactos de Linux
         uses: actions/upload-artifact@v4
@@ -132,26 +132,23 @@ jobs:
       - name: Checkout Código Fuente
         uses: actions/checkout@v4
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'pip'
+      - name: Configurar Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Instalar Dependencias y PyInstaller
+      - name: Compilar binarios Rust de macOS
         run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-          pip install pyinstaller wheel
-
-      - name: Compilar binario nativo de macOS
-        run: |
-          python -m packwire build --exe
+          cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 
       - name: Empaquetar tar.gz de macOS
         run: |
-          chmod +x dist/packwire
-          tar -czvf dist/packwire-macos-universal.tar.gz -C dist packwire
+          mkdir -p dist/packwire-macos-universal/web
+          cp packwire-rs/target/release/packwire dist/packwire-macos-universal/packwire
+          cp packwire-rs/target/release/packwirew dist/packwire-macos-universal/packwirew
+          cp -R assets/web/. dist/packwire-macos-universal/web/
+          mkdir -p dist/packwire-macos-universal/manifests
+          cp assets/manifests/*.json dist/packwire-macos-universal/manifests/
+          chmod +x dist/packwire-macos-universal/packwire dist/packwire-macos-universal/packwirew
+          tar -czvf dist/packwire-macos-universal.tar.gz -C dist packwire-macos-universal
 
       - name: Subir Artefactos de macOS
         uses: actions/upload-artifact@v4
@@ -205,7 +202,7 @@ jobs:
           if [ "${{ github.ref_type }}" = "tag" ]; then
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           else
-            echo "tag=${{ github.event.inputs.tag_name || 'v0.1.0' }}" >> $GITHUB_OUTPUT
+            echo "tag=${{ github.event.inputs.tag_name || 'v1.0.0' }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Publicar Release en GitHub

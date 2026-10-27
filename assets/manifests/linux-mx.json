@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-mx",
+  "name": "Linux · MX Linux Xfce (PCs viejas)",
+  "aliases": ["linux-mx", "mx-linux", "mx-xfce"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Alternativa equilibrada para hardware antiguo o modesto; la edición Xfce prioriza consumo bajo y estabilidad.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://mxlinux.org/download-links/"
+    },
+    "clean": true
+  }
+}

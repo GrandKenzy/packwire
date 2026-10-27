@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-zorin",
+  "name": "Linux · Zorin OS (uso personal)",
+  "aliases": ["zorin", "zorin-os", "linux-windows-transition"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Enfocada en una transición sencilla desde Windows, con ediciones oficiales Core, Education, Lite y Pro.",
+  "install": {"mode": "site", "site": {"url": "https://zorin.com/os/download/"}, "clean": true}
+}

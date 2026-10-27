@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "sqlite",
+  "name": "SQLite",
+  "aliases": ["sqlite", "sqlite3", "database"],
+  "icon": "🗃️",
+  "type": "stable",
+  "category": "tools",
+  "description": "Base de datos embebida y herramienta CLI para consultar archivos SQLite.",
+  "upstream": {"source": "winget", "id": "SQLite.SQLite"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar SQLite.' }; winget install --id SQLite.SQLite -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["sqlite3.exe"]
+    },
+    "site": {"url": "https://www.sqlite.org/download.html"},
+    "clean": true
+  }
+}

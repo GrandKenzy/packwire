@@ -1,4 +1,0 @@
-include README.md
-include LICENSE
-recursive-include packwire/core/manifests *.json
-recursive-include packwire/core/gui/web *

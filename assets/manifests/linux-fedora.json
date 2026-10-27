@@ -1,0 +1,18 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-fedora",
+  "name": "Linux · Fedora Workstation (programación)",
+  "aliases": ["fedora", "fedora-workstation", "linux-dev"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Buena opción para programación y desarrollo: paquetes recientes, herramientas modernas y documentación oficial con verificación criptográfica.",
+  "install": {
+    "mode": "site",
+    "site": {
+      "url": "https://fedoraproject.org/workstation/download/"
+    },
+    "clean": true
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "packwire-v1",
+  "id": "linux-almalinux",
+  "name": "Linux · AlmaLinux (servidores)",
+  "aliases": ["almalinux", "linux-almalinux", "rhel-compatible"],
+  "icon": "🖥️",
+  "type": "stable",
+  "version": "latest",
+  "category": "linux",
+  "description": "Distribución compatible con el ecosistema RHEL, orientada a servidores, nube, contenedores y entornos administrados.",
+  "install": {"mode": "site", "site": {"url": "https://almalinux.org/get-almalinux/"}, "clean": true}
+}

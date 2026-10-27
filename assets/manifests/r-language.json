@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "r-language",
+  "name": "R",
+  "aliases": ["r", "r-project", "rscript"],
+  "icon": "📊",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje y entorno para estadística, análisis de datos y visualización.",
+  "upstream": {"source": "winget", "id": "RProject.R"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar R.' }; winget install --id RProject.R -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["R.exe", "Rscript.exe"]
+    },
+    "site": {"url": "https://cran.r-project.org/bin/windows/base/"},
+    "clean": true
+  }
+}

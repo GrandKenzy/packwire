@@ -6,7 +6,7 @@ Packwire uses a modular CSS architecture that enables real-time switching betwee
 
 ## 1. Modular CSS Layout
 
-Styles inside `packwire/core/gui/web/global/` are split into functional domains:
+Styles inside `assets/web/global/` are split into functional domains:
 - **`structure.css`:** Core grid, layout dimensions, flex containers, modal overlays, and typography.
 - **`*_background.css`:** Background colors, surface layers, and scrollbar styles.
 - **`*_cards.css`:** Card borders, elevations, hover states, and badge colors.

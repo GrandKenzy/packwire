@@ -1,23 +1,29 @@
 # Inno Setup Installer
 
-For Windows enterprise and desktop environments, Packwire provides an Inno Setup script ([`installer.iss`](file:///installer.iss)) to compile `Packwire-Setup.exe`.
+Packwire uses [`installer.iss`](../../../installer.iss) to generate `Packwire-Setup.exe` from the Rust binaries and the resources under `assets/`.
 
----
+## Installed contents
 
-## 1. Specifications
+- `packwire.exe`: native CLI.
+- `packwirew.exe`: windowed GUI without a console.
+- `web/`: dashboard frontend.
+- `manifests/`: package catalog.
+- `front.ico`: Packwire icon for shortcuts and the uninstaller.
 
-- **Target Location:** `{localappdata}\Programs\Packwire` (no administrator privileges required).
-- **Compression:** `lzma2/ultra64` with solid compression.
-- **Shortcuts:** Start Menu programs group and optional desktop icon.
-- **Environment Updates:** Configures User PATH in registry and runs `packwire setup` silently on post-install.
-- **Clean Uninstallation:** Invokes `packwire uninstall --all` on uninstallation to cleanly purge packages, shims, and cache.
+The default destination is `{localappdata}\Programs\Packwire`, so administrator privileges are not required. The installer can add the application directory to the user PATH and creates Start Menu and optional Desktop shortcuts.
 
----
+## Build
 
-## 2. Compiling
+Build the binaries first:
 
-Using the Inno Setup 6 command-line compiler:
-```cmd
+```powershell
+cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
+```
+
+Then run Inno Setup 6:
+
+```text
 iscc installer.iss
 ```
-The resulting installer is saved to `dist\Packwire-Setup.exe`.
+
+The output is written to `dist/Packwire-Setup.exe`.

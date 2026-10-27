@@ -1,23 +1,18 @@
-# IPC Bridge & Communication
+# GUI and Backend Communication
 
-The `packwire.core.gui.bridge.GuiBridge` class acts as the bridge connecting the webview frontend to the core package manager.
+Packwire's bridge is implemented in `packwire-rs/src/gui.rs`. The web frontend and the Rust core exchange JSON objects through local HTTP endpoints; the native GUI loads the same server inside `packwirew.exe`.
 
----
+## Main operations
 
-## 1. API Methods
+| Operation | Purpose |
+|---|---|
+| `get_available` | Lists catalog manifests. |
+| `get_installed` | Reads installed-package state. |
+| `install` | Queues an installation. |
+| `uninstall` | Removes a managed package. |
+| `get_jobs` / `get_job` | Reads task progress. |
+| `get_config` / `set_config` | Reads or persists configuration. |
+| `get_system_info` | Returns local system diagnostics. |
+| `list_system_apps` | Lists applications detected by Windows. |
 
-| Method | Parameters | Returns | Description |
-| :--- | :--- | :--- | :--- |
-| `get_system_info` | None | `dict` | OS name, architecture, PATH status, and hardware diagnostics. |
-| `list_available` | None | `list[dict]` | All manifests available in the catalog with resolved versions. |
-| `list_installed` | None | `dict` | Dictionary of currently installed packages and state. |
-| `queue_install` | `id, mode, version, force` | `dict` | Submits an install task to the background `TaskQueue` and returns `job_id`. |
-| `get_job` | `job_id` | `dict` | Retrieves live status, percentage, and log messages for a task. |
-| `uninstall` | `id` | `dict` | Uninstalls a package synchronously. |
-| `uninstall_all` | `remove_path` | `dict` | Completely wipes all packages, shims, cache, and PATH registration. |
-| `reinstall` | `id` | `dict` | Performs a clean reinstallation of an existing package. |
-| `check_updates` | None | `dict` | Checks for available upstream updates for installed packages. |
-| `update` | `id` (optional) | `list[dict]` | Updates specified or all packages on the `stable` channel. |
-| `add_path` | None | `dict` | Adds the shims directory to user PATH environment variables. |
-| `add_defender_exclusion` | None | `dict` | Prompts UAC elevation to configure Windows Defender exclusions for GCC. |
-| `open_guide` | `guide_name` | `dict` | Opens a local HTML guide (such as the Windows 11 GCC setup guide). |
+Responses are serialized with `serde_json`. Network, extraction, and installation work runs outside the render thread through `task_queue.rs`, keeping the window responsive.

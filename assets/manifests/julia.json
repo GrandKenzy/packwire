@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "julia",
+  "name": "Julia",
+  "aliases": ["julia", "julia-lang"],
+  "icon": "🔬",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje de alto rendimiento para ciencia de datos, matemáticas y computación científica.",
+  "upstream": {"source": "winget", "id": "Julialang.Julia"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar Julia.' }; winget install --id Julialang.Julia -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["julia.exe"]
+    },
+    "site": {"url": "https://julialang.org/downloads/"},
+    "clean": true
+  }
+}

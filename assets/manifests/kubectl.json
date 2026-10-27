@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "kubectl",
+  "name": "kubectl",
+  "aliases": ["kubectl", "kubernetes", "k8s"],
+  "icon": "☸️",
+  "type": "stable",
+  "category": "tools",
+  "description": "CLI oficial para administrar clústeres de Kubernetes.",
+  "upstream": {"source": "winget", "id": "Kubernetes.kubectl"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar kubectl.' }; winget install --id Kubernetes.kubectl -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["kubectl.exe"]
+    },
+    "site": {"url": "https://kubernetes.io/docs/tasks/tools/"},
+    "clean": true
+  }
+}

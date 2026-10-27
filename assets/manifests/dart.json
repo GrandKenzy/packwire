@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "dart",
+  "name": "Dart",
+  "aliases": ["dart", "flutter"],
+  "icon": "🎯",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje y SDK para aplicaciones web, CLI, servidor y Flutter.",
+  "upstream": {"source": "winget", "id": "Google.DartSDK"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar Dart.' }; winget install --id Google.DartSDK -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["dart.exe", "pub.bat"]
+    },
+    "site": {"url": "https://dart.dev/get-dart"},
+    "clean": true
+  }
+}

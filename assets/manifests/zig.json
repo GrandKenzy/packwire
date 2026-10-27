@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "zig",
+  "name": "Zig",
+  "aliases": ["zig", "ziglang"],
+  "icon": "⚡",
+  "type": "stable",
+  "category": "programming languages",
+  "description": "Lenguaje y toolchain moderno para software nativo, sistemas y compilación cruzada.",
+  "upstream": {"source": "winget", "id": "zig.zig"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar Zig.' }; winget install --id zig.zig -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["zig.exe"]
+    },
+    "site": {"url": "https://ziglang.org/download/"},
+    "clean": true
+  }
+}

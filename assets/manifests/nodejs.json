@@ -1,0 +1,45 @@
+{
+  "$schema": "packwire-v1",
+  "id": "nodejs@stable",
+  "name": "Node.js",
+  "aliases": ["node", "nodejs", "npm", "npx"],
+  "icon": "⚡",
+  "type": "stable",
+  "category": "runtimes",
+  "description": "Entorno de ejecución de JavaScript (V8) del lado del servidor con npm y npx incluidos.",
+  "upstream": {
+    "source": "nodejs_org_api",
+    "endpoint": "https://nodejs.org/dist/index.json"
+  },
+  "install": {
+    "mode": "here",
+    "here": {
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-win-x64.zip",
+      "format": "zip",
+      "binaries": ["node.exe", "npm.cmd", "npx.cmd"],
+      "addpath": true
+    },
+    "site": {
+      "url": "https://nodejs.org/en/download"
+    },
+    "clean": true,
+    "os": {
+      "linux": {
+        "mode": "command",
+        "command": {
+          "script": "which apt-get >/dev/null 2>&1 && sudo apt-get update && sudo apt-get install -y nodejs npm || which pacman >/dev/null 2>&1 && sudo pacman -S --noconfirm nodejs npm || which dnf >/dev/null 2>&1 && sudo dnf install -y nodejs npm || echo 'Instala Node.js mediante tu gestor de paquetes'",
+          "binaries": ["node", "npm", "npx"],
+          "elevated": true
+        }
+      },
+      "darwin": {
+        "mode": "command",
+        "command": {
+          "script": "which brew >/dev/null 2>&1 && brew install node || echo 'Instala Node.js con Homebrew (brew install node)'",
+          "binaries": ["node", "npm", "npx"],
+          "elevated": false
+        }
+      }
+    }
+  }
+}

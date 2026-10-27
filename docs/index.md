@@ -1,14 +1,14 @@
 # Documentación de Packwire / Packwire Documentation
 
-> **Versión / Version:** `0.1.4`  
-> **Entorno / Runtime:** Python 3.9+ (Windows, Linux, macOS)  
+> **Versión / Version:** `1.0.0`
+> **Implementación / Implementation:** Rust nativo / Native Rust (Windows, Linux, macOS)
 > **Licencia / License:** MIT  
 
 Bienvenido a la documentación oficial de **Packwire**. Selecciona tu idioma preferido:  
 Welcome to the official documentation for **Packwire**. Please select your preferred language:
 
-- 🇪🇸 **[Documentación en Español](./es/index.md)** — Manual de arquitectura, módulos del núcleo, interfaz gráfica, distribución y referencia completa de comandos y API.
-- 🇬🇧 **[English Documentation](./en/index.md)** — Comprehensive guide covering system architecture, core modules, graphical interface, distribution, and complete CLI/API reference.
+- 🇪🇸 **[Documentación en Español](./es/index.md)** — Manual de arquitectura, módulos del núcleo, interfaz gráfica, distribución y referencia completa de comandos.
+- 🇬🇧 **[English Documentation](./en/index.md)** — Comprehensive guide covering system architecture, core modules, graphical interface, distribution, and the complete CLI reference.
 
 ---
 

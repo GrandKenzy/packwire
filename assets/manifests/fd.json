@@ -1,0 +1,20 @@
+{
+  "$schema": "packwire-v1",
+  "id": "fd",
+  "name": "fd",
+  "aliases": ["fd", "find", "file search"],
+  "icon": "📁",
+  "type": "stable",
+  "category": "tools",
+  "description": "Alternativa rápida y amigable a find para buscar archivos.",
+  "upstream": {"source": "winget", "id": "sharkdp.fd"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar fd.' }; winget install --id sharkdp.fd -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["fd.exe"]
+    },
+    "site": {"url": "https://github.com/sharkdp/fd/releases"},
+    "clean": true
+  }
+}
