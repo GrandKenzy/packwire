@@ -53,7 +53,7 @@ class DownloaderVisitor:
         print(f"[Packwire Downloader] Descargando desde: {url}")
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "Packwire/0.1.0 (Windows; Python)"}
+            headers={"User-Agent": "Packwire/0.1.4 (Windows; Python)"}
         )
 
         try:

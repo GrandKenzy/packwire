@@ -137,7 +137,7 @@ packwire ui --web
 
 ## 📦 Instalación y Descarga
 
-> 📖 **Documentación completa:** Para instrucciones detalladas y solución de problemas, consulta la [Guía Completa de Instalación](docs/04-Distribucion/guia_instalacion.md).
+> 📖 **Documentación completa:** Para instrucciones detalladas y solución de problemas, consulta la [Guía Completa de Instalación](docs/es/04-Distribucion/01-guia-instalacion.md) o [Full Installation Guide](docs/en/04-Distribution/01-installation-guide.md).
 
 ### 🌟 Método Recomendado: Binarios Oficiales Precompilados (Sin Python / Sin Código Fuente)
 
@@ -207,10 +207,43 @@ packwire.launch_gui(web_mode=True)
 
 ---
 
+## 📚 Documentación / Documentation
+
+Documentación completa y bilingüe disponible en Español e Inglés:
+Full documentation is available in English and Spanish:
+
+- 🇪🇸 **[Documentación en Español](docs/es/index.md)**
+- 🇬🇧 **[English Documentation](docs/en/index.md)**
+
+### Mapa de Secciones / Section Map
+- **01. Arquitectura / Architecture:** [ES](docs/es/01-Arquitectura/index.md) \| [EN](docs/en/01-Architecture/index.md)
+- **02. Módulos / Modules:** [ES](docs/es/02-Modulos/index.md) \| [EN](docs/en/02-Modules/index.md)
+- **03. Interfaz / Interface:** [ES](docs/es/03-Interfaz/index.md) \| [EN](docs/en/03-Interface/index.md)
+- **04. Distribución / Distribution:** [ES](docs/es/04-Distribucion/index.md) \| [EN](docs/en/04-Distribution/index.md)
+- **05. Referencia / Reference:** [ES](docs/es/05-Referencia/index.md) \| [EN](docs/en/05-Reference/index.md)
+
+---
+
 ## 📁 Estructura del Proyecto
 
 ```text
 packwire/
+├── docs/                         # Documentación bilingüe estructurada (Gram standard)
+│   ├── es/                       # Documentación completa en Español
+│   │   ├── 01-Arquitectura/
+│   │   ├── 02-Modulos/
+│   │   ├── 03-Interfaz/
+│   │   ├── 04-Distribucion/
+│   │   ├── 05-Referencia/
+│   │   └── index.md
+│   ├── en/                       # Full documentation in English
+│   │   ├── 01-Architecture/
+│   │   ├── 02-Modules/
+│   │   ├── 03-Interface/
+│   │   ├── 04-Distribution/
+│   │   ├── 05-Reference/
+│   │   └── index.md
+│   └── index.md                  # Gateway bilingüe
 ├── packwire/                     # Paquete principal autosuficiente
 │   ├── __init__.py               # API pública de alto nivel
 │   ├── __main__.py               # Entrypoint para python -m packwire
@@ -224,7 +257,7 @@ packwire/
 │       ├── state.py              # Detección de colisiones y registro de estado
 │       ├── installer.py          # Orquestador de modos 'here', 'command' y 'site'
 │       ├── task_queue.py         # Cola de descargas e instalaciones concurrentes
-│       ├── manifests/            # Catálogo de manifests incluidos (Python, C/GCC, Node, FFMPEG, etc.)
+│       ├── manifests/            # Catálogo de 44 manifests incluidos
 │       ├── gui/                  # Interfaz Gráfica (HTML/CSS)
 │       │   ├── bridge.py         # Puente Python <-> JS
 │       │   ├── server.py         # Servidor HTTP local ligero
@@ -238,9 +271,11 @@ packwire/
 │           └── updater.py        # Actualizador de paquetes stable
 ├── install.bat                   # Instalador rápido de un clic para Windows
 ├── install.ps1                   # Script de instalación automatizada en PowerShell
+├── install.sh                    # Script de instalación automatizada en POSIX (Linux/macOS)
 ├── installer.iss                 # Script de Inno Setup para crear Packwire-Setup.exe
-├── packwire.spec                 # Especificación de PyInstaller para packwire.exe
+├── packwire.spec                 # Especificación de PyInstaller para packwire.exe y packwirew.exe
 ├── pyproject.toml                # Metadatos del paquete (PEP 517/621)
 ├── setup.py                      # Configuración estándar de distribución
+├── MANIFEST.in                   # Manifiesto de inclusión de recursos web y manifests
 └── README.md
 ```

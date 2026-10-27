@@ -87,18 +87,23 @@ end;
 
 procedure RemovePathFromUserEnvironment();
 var
-  Paths: string;
+  Paths, PaddedPaths: string;
   AppDir: string;
   P: Integer;
 begin
   AppDir := ExpandConstant('{app}');
   if RegQueryStringValue(HKEY_CURRENT_USER, EnvironmentKey, 'Path', Paths) then
   begin
-    P := Pos(';' + Uppercase(AppDir) + ';', ';' + Uppercase(Paths) + ';');
+    PaddedPaths := ';' + Paths + ';';
+    P := Pos(';' + Uppercase(AppDir) + ';', Uppercase(PaddedPaths));
     if P > 0 then
     begin
-      Delete(Paths, P, Length(AppDir) + 1);
-      RegWriteStringValue(HKEY_CURRENT_USER, EnvironmentKey, 'Path', Paths);
+      Delete(PaddedPaths, P, Length(AppDir) + 1);
+      if (Length(PaddedPaths) > 0) and (PaddedPaths[1] = ';') then
+        Delete(PaddedPaths, 1, 1);
+      if (Length(PaddedPaths) > 0) and (PaddedPaths[Length(PaddedPaths)] = ';') then
+        Delete(PaddedPaths, Length(PaddedPaths), 1);
+      RegWriteStringValue(HKEY_CURRENT_USER, EnvironmentKey, 'Path', PaddedPaths);
     end;
   end;
 end;

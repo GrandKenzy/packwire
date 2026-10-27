@@ -14,7 +14,6 @@ from pathlib import Path
 from typing import Optional, Tuple, List, Callable
 
 
-
 from packwire.core.config import APPS_DIR, CACHE_DIR, PACKWIRE_ROOT, SYSTEM, ensure_directories
 
 from packwire.core.models import Manifest, PackageState, InstallConfig
@@ -28,13 +27,9 @@ from packwire.core.visitors.pather import PatherVisitor
 from packwire.core.visitors.process_manifest import ManifestVisitor
 
 
-
-
-
 class Installer:
 
     """Orchestrates package installations in 'here', 'command', and 'site' modes."""
-
 
 
     def __init__(
@@ -56,7 +51,6 @@ class Installer:
         self.manifest_visitor = manifest_visitor or ManifestVisitor()
 
         ensure_directories()
-
 
 
     def install(
@@ -108,9 +102,7 @@ class Installer:
                     manifest.install.site = override_cfg.site
 
 
-
         mode = (mode_override or manifest.install.mode or "here").lower()
-
 
 
         # Check collision and duplicate
@@ -126,15 +118,12 @@ class Installer:
             binaries = manifest.install.command.binaries
 
 
-
         is_dup, dup_msg, collisions = check_collision(manifest.id, binaries)
-
 
 
         if is_dup and not force:
 
             return False, dup_msg
-
 
 
         if collisions and not force:
@@ -146,7 +135,6 @@ class Installer:
             if logger:
 
                 logger(warn_msg)
-
 
 
         if mode == "site":
@@ -166,7 +154,6 @@ class Installer:
             return False, f"Modo de instalación no reconocido: '{mode}'"
 
 
-
     def _install_site(
 
         self,
@@ -184,7 +171,6 @@ class Installer:
             return False, f"El paquete '{manifest.id}' no tiene configurada una URL en 'site'."
 
 
-
         url = manifest.install.site.url
 
         msg = f"Redirigiendo al sitio oficial para instalación manual: {url}"
@@ -196,7 +182,6 @@ class Installer:
             logger(msg)
 
         webbrowser.open(url)
-
 
 
         # Register state
@@ -226,9 +211,7 @@ class Installer:
         register_installed(state)
 
 
-
         return True, f"Navegador abierto en {url}. Instalación manual iniciada."
-
 
 
     def _install_here(
@@ -256,13 +239,11 @@ class Installer:
                 logger(msg)
 
 
-
         here_cfg = manifest.install.here
 
         if not here_cfg or not here_cfg.url:
 
             return False, f"El paquete '{manifest.id}' no tiene una URL configurada para el modo 'here'."
-
 
 
         # Target directory: APPS_DIR / <name> / <version>
@@ -275,9 +256,7 @@ class Installer:
         target_dir.mkdir(parents=True, exist_ok=True)
 
 
-
         log(f"Instalando '{manifest.name}' ({ver_slug}) en: {target_dir}")
-
 
 
         # 1. Download
@@ -295,7 +274,6 @@ class Installer:
         log(f"Descarga completada: {downloaded_file.name}")
 
 
-
         # 2. Extract or run
 
         suffix = downloaded_file.suffix.lower()
@@ -304,7 +282,6 @@ class Installer:
         is_zip = here_cfg.format.lower() == "zip" or suffix == ".zip"
 
         is_tar = suffix in [".tar", ".gz", ".xz", ".tgz", ".bz2"] or ".tar." in downloaded_file.name.lower()
-
 
 
         if is_7z_sfx:
@@ -378,11 +355,9 @@ class Installer:
                 return False, f"Error durante la extracción ZIP: {e}"
 
 
-
             # Special hook for Python embeddable zip: enable site-packages
 
             self._patch_python_embed_pth(target_dir)
-
 
 
             # Check if GCC as.exe was silently deleted by Windows Defender in background
@@ -456,7 +431,6 @@ class Installer:
                 return False, f"Error durante la instalación ejecutable: {res.stderr}"
 
 
-
         # 3. Create shims
 
         created_shims = []
@@ -480,11 +454,9 @@ class Installer:
             )
 
 
-
             # Ensure shims dir is in User PATH
 
             self.pather.add_shims_to_user_path()
-
 
 
         # 4. Clean cache if requested
@@ -494,7 +466,6 @@ class Installer:
             downloaded_file.unlink(missing_ok=True)
 
             log(f"Archivo temporal limpio: {downloaded_file.name}")
-
 
 
         # 5. Register state
@@ -524,11 +495,9 @@ class Installer:
         register_installed(state)
 
 
-
         log(f"¡'{manifest.name}' ({ver_slug}) instalado con éxito!")
 
         return True, f"'{manifest.name}' ({ver_slug}) instalado con éxito en modo 'here'."
-
 
 
     def _install_command(
@@ -554,13 +523,11 @@ class Installer:
                 logger(msg)
 
 
-
         cmd_cfg = manifest.install.command
 
         if not cmd_cfg:
 
             return False, f"El paquete '{manifest.id}' no tiene configurado ningún comando en 'install.command'."
-
 
 
         # 1. Resolve script for current platform
@@ -580,15 +547,12 @@ class Installer:
             script = cmd_cfg.linux or cmd_cfg.script
 
 
-
         if not script:
 
             return False, f"El paquete '{manifest.id}' no cuenta con comando para la plataforma '{SYSTEM}'."
 
 
-
         log(f"Iniciando instalación por comando para '{manifest.name}' ({SYSTEM})...")
-
 
 
         # 2. Check elevation
@@ -602,7 +566,6 @@ class Installer:
                 temp_script = CACHE_DIR / f"cmd_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.ps1"
 
                 temp_log = CACHE_DIR / f"log_{manifest.name.lower().replace('/', '_')}_{uuid.uuid4().hex[:6]}.txt"
-
 
 
                 wrapped_script = f"""
@@ -628,7 +591,6 @@ try {{
 """
 
                 temp_script.write_text(wrapped_script, encoding="utf-8")
-
 
 
                 uac_ps = [
@@ -666,7 +628,6 @@ try {{
                     temp_script.unlink(missing_ok=True)
 
 
-
                     if proc.returncode != 0:
 
                         return False, "El comando elevado finalizó con error o la elevación fue cancelada por el usuario."
@@ -680,7 +641,6 @@ try {{
                     temp_log.unlink(missing_ok=True)
 
                     return False, f"Fallo al invocar UAC: {e}"
-
 
 
             elif SYSTEM == "darwin":
@@ -714,7 +674,6 @@ try {{
                     return False, f"Fallo al invocar autorización en macOS: {e}"
 
 
-
             elif SYSTEM == "linux":
 
                 log("⚠️ Este paquete requiere permisos de Administrador (root) en Linux...")
@@ -734,7 +693,6 @@ try {{
                 else:
 
                     args = ["sudo", "/bin/bash", "-c", script]
-
 
 
                 try:
@@ -798,7 +756,6 @@ try {{
                 args = ["/bin/bash", "-c", script]
 
 
-
             try:
 
                 proc = subprocess.Popen(
@@ -836,7 +793,6 @@ try {{
                 return False, f"Error al ejecutar comando: {e}"
 
 
-
         # 3. Verify resulting binaries
 
         binaries = cmd_cfg.binaries or []
@@ -858,7 +814,6 @@ try {{
                 else:
 
                     log(f"ℹ️ El binario '{b}' estará disponible tras reiniciar la sesión o la terminal.")
-
 
 
         ver_slug = manifest.version or "command"
@@ -888,11 +843,9 @@ try {{
         register_installed(state)
 
 
-
         log(f"¡'{manifest.name}' instalado con éxito!")
 
         return True, f"'{manifest.name}' instalado correctamente mediante comandos de consola."
-
 
 
     @staticmethod

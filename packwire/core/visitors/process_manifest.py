@@ -71,7 +71,6 @@ class ManifestVisitor:
         search_dirs = [
             BUILTIN_MANIFESTS_DIR,
             self.manifests_dir,
-            Path(__file__).resolve().parent.parent / "packs"
         ]
 
         normalized_id = identifier.lower().replace("@", "-").replace(":", "-")
@@ -118,7 +117,7 @@ class ManifestVisitor:
                 except Exception:
                     continue
 
-            # Subdirectory search (e.g. packs/<uuid>/manifest.json or packs/python/manifest.json)
+            # Subdirectory search (e.g. manifests/<subfolder>/manifest.json)
             for sub in d.iterdir():
                 if sub.is_dir():
                     sub_manifest = sub / "manifest.json"

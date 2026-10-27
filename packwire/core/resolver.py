@@ -19,7 +19,7 @@ class PythonResolver:
             return cls._cached_releases
         req = urllib.request.Request(
             cls.RELEASES_API,
-            headers={"User-Agent": "Packwire/0.1.0"}
+            headers={"User-Agent": "Packwire/0.1.4"}
         )
         try:
             with urllib.request.urlopen(req, timeout=10) as res:
@@ -66,7 +66,7 @@ class PythonResolver:
         if release_id:
             files_url = f"{cls.RELEASE_FILES_API}{release_id}"
             try:
-                req = urllib.request.Request(files_url, headers={"User-Agent": "Packwire/0.1.0"})
+                req = urllib.request.Request(files_url, headers={"User-Agent": "Packwire/0.1.4"})
                 with urllib.request.urlopen(req, timeout=10) as res:
                     files_data = json.loads(res.read().decode("utf-8"))
                     for f in files_data:
@@ -112,7 +112,7 @@ class NodeResolver:
             return cls._cached_releases
         req = urllib.request.Request(
             cls.DIST_INDEX_API,
-            headers={"User-Agent": "Packwire/0.1.0"}
+            headers={"User-Agent": "Packwire/0.1.4"}
         )
         try:
             with urllib.request.urlopen(req, timeout=10) as res:

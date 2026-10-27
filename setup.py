@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name="packwire",
     version="0.1.4",
-    description="Gestor y descargador moderno, elegante y portátil de paquetes para Windows",
+    description="Gestor y descargador moderno, elegante y portátil de paquetes para Windows, Linux y macOS",
     author="Packwire Team",
     packages=find_packages(),
     include_package_data=True,
@@ -13,6 +13,7 @@ setup(
             "manifests/*.json",
             "gui/web/*.*",
             "gui/web/global/*.css",
+            "gui/web/guides/*.html",
         ]
     },
     install_requires=[

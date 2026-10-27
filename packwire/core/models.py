@@ -132,7 +132,7 @@ class Manifest:
             type=pkg_type,
             version=ver,
             icon=data.get("icon", "📦"),
-            category=data.get("agroup", data.get("category", "general")),
+            category=data.get("category", "general"),
             description=data.get("description", ""),
             aliases=data.get("aliases", []),
             upstream=data.get("upstream"),
