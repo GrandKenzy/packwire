@@ -4,65 +4,74 @@
 
 # Packwire
 
-Gestor nativo de paquetes para Windows, escrito en Rust. Packwire permite descubrir, instalar y administrar herramientas, lenguajes de programación, runtimes y sistemas operativos desde una CLI y una interfaz gráfica.
+Packwire es un gestor moderno de aplicaciones y herramientas para Windows. Desde una sola interfaz permite descubrir, descargar e instalar paquetes, lenguajes de programación, runtimes, herramientas de desarrollo y sistemas operativos.
 
-## Descargar
+Su objetivo es simplificar la preparación de un equipo nuevo: Packwire reúne el catálogo, la instalación y la administración de las aplicaciones en un solo lugar.
 
-La versión estable actual es **1.0.0**.
+## Características
 
-- [Instalador para Windows](https://github.com/GrandKenzy/packwire/releases/latest)
-- [Versiones y archivos disponibles](https://github.com/GrandKenzy/packwire/releases)
+- Catálogo organizado por categorías.
+- Instalación directa de paquetes desde sus fuentes oficiales.
+- Selección de versiones estables y versiones específicas cuando están disponibles.
+- Secciones independientes para herramientas, sistemas operativos y aplicaciones.
+- Detección de aplicaciones instaladas y aplicaciones administradas por Packwire.
+- Interfaz gráfica moderna y aplicación de consola para tareas rápidas.
+- Descargas en segundo plano con consola oculta cuando la instalación lo permite.
+- Gestión de accesos y shims para facilitar el uso de las herramientas instaladas.
+- Verificación de actualizaciones de Packwire.
 
-El instalador incluye la CLI (`packwire.exe`), la GUI (`packwirew.exe`), el catálogo de manifests y los recursos web. No requiere Python.
+## Contenido del catálogo
 
-## Uso básico
+Packwire puede ofrecer, entre otros:
 
-Desde una terminal:
+- Lenguajes: Python, Rust, Go, Java, Node.js, Ruby, PHP, Dart, Julia, R y Zig.
+- Herramientas: Git, CMake, LLVM, GCC, Clang, Docker, PowerShell, Terraform y GitHub CLI.
+- Utilidades: 7-Zip, FFmpeg, SQLite, jq, ripgrep, fzf, Ninja y Make.
+- Sistemas operativos y herramientas para crear medios de instalación.
+- Aplicaciones disponibles mediante sus instaladores o sitios oficiales.
+
+## Instalación
+
+Descarga la versión estable más reciente desde [GitHub Releases](https://github.com/GrandKenzy/packwire/releases/latest).
+
+Para Windows están disponibles:
+
+- **Instalador:** configura Packwire y crea sus accesos directos.
+- **Versión portable:** permite ejecutar Packwire sin instalación.
+
+La versión actual es **1.0.0**.
+
+## Uso
+
+Abre `packwirew.exe` para utilizar la interfaz gráfica. Desde ella puedes explorar el catálogo, consultar versiones, instalar aplicaciones y revisar el estado de las instalaciones.
+
+También puedes usar la consola:
 
 ```powershell
-# Abrir la interfaz gráfica
-packwirew.exe
-
-# Consultar el catálogo
+# Ver el catálogo disponible
 packwire available
 
-# Instalar un paquete
+# Instalar una aplicación
 packwire install git
 
-# Ver aplicaciones instaladas
+# Listar aplicaciones instaladas
 packwire list
 
-# Consultar un manifest
+# Consultar información de un paquete
 packwire info python
 ```
 
-La GUI permite explorar el catálogo, instalar paquetes, consultar versiones y revisar las aplicaciones detectadas en el sistema.
+## Ficha técnica
 
-## Desarrollo
-
-Requisitos: Rust estable y Windows con WebView2 para la interfaz gráfica.
-
-```powershell
-cargo test --manifest-path packwire-rs/Cargo.toml --lib
-cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
-```
-
-El instalador se genera con Inno Setup usando `installer.iss`. El catálogo se encuentra en `assets/manifests/` y los recursos de la GUI en `assets/web/`.
-
-## Estructura
-
-```text
-packwire/
-├── assets/                 # Catálogo y recursos de la GUI
-├── discentra_central/      # Metadatos e imágenes para Central
-├── docs/                   # Documentación en español e inglés
-├── packwire-rs/            # CLI, GUI y núcleo nativos en Rust
-└── installer.iss           # Instalador de Windows
-```
-
-## Estado
-
-Packwire 1.0.0 es la primera versión estable. La implementación antigua en Python y su cadena de empaquetado fueron eliminadas del proyecto.
+| Característica | Detalle |
+|---|---|
+| Nombre | Packwire |
+| Versión estable | 1.0.0 |
+| Plataforma principal | Windows |
+| Interfaz | GUI nativa y CLI |
+| Catálogo | Herramientas, lenguajes, runtimes, utilidades y sistemas operativos |
+| Distribución | Instalador y versión portable |
+| Licenciamiento de aplicaciones | Cada paquete conserva las condiciones de su distribuidor oficial |
 
 <p align="center">
   <img src="discentra_central/badge/footer.png" alt="Packwire" width="100%">
