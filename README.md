@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="discentra_central/badge/banner.jpg" alt="Packwire" width="100%">
+  <img src="discentra_central/badge/banner.png" alt="Packwire" width="100%">
 </p>
 
 # Packwire
