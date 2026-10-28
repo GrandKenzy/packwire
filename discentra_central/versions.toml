@@ -1,2 +1,7 @@
 [v1.0.0]
-hide = ["packwire.exe", "packwirew.exe"]
+hide = [
+  "Packwire-Setup-v1.0.0.exe",
+  "packwire.exe",
+  "packwirew.exe",
+  "SHA256SUMS.txt",
+]
