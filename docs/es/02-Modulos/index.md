@@ -1,6 +1,6 @@
 # 02. Módulos del Núcleo
 
-> **Versión Actual:** `1.0.0`
+> **Versión Actual:** `1.2.0`
 > **Núcleo:** `packwire-rs/src/`
 
 La sección de Módulos detalla los contratos de datos, el motor de resolución dinámica de versiones y los tres modos de instalación del núcleo Rust.

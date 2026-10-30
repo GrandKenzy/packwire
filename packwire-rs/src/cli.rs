@@ -6,7 +6,7 @@ use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 
 use crate::config::{paths, Paths};
 use crate::installer::{InstallResult, Installer};
-use crate::manifest::ManifestLoader;
+use crate::manifest::{sync_remote_catalog, ManifestLoader};
 use crate::models::Manifest;
 use crate::pather::Pather;
 use crate::resolver::{resolve_manifest, Resolver};
@@ -93,7 +93,12 @@ pub struct CliContext {
 
 impl CliContext {
     pub fn new() -> InstallResult<Self> {
-        Self::with_paths(paths())
+        let paths = paths();
+        let sync = sync_remote_catalog(&paths.manifests_dir);
+        if sync.updated {
+            println!("[Packwire] {}", sync.message);
+        }
+        Self::with_paths(paths)
     }
 
     pub fn with_paths(paths: Paths) -> InstallResult<Self> {

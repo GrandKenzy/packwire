@@ -3,7 +3,7 @@
 | Campo | Detalle |
 |---|---|
 | Nombre | Packwire |
-| Versión estable | `1.0.0` |
+| Versión estable | `1.2.0` |
 | Plataforma | Windows 10/11 |
 | Arquitectura | x64 |
 | Tipo | Gestor de aplicaciones y herramientas |

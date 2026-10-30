@@ -1,6 +1,6 @@
 # 05. Referencia y Diagnósticos
 
-> **Versión Actual:** `1.0.0`
+> **Versión Actual:** `1.2.0`
 > **Compatibilidad:** Rust nativo y WebView2/WebKit del sistema
 
 Referencia técnica exhaustiva de la interfaz de comandos (CLI), el catálogo de diagnósticos y errores, las distribuciones Linux recomendadas y el plan de privacidad y telemetría de hardware.

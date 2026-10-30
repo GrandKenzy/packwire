@@ -21,7 +21,7 @@ cargo test --manifest-path packwire-rs/Cargo.toml
 cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 ```
 
-The catalog and dashboard resources are read from `assets/manifests/` and `assets/web/`.
+For a local build, the source catalog is read from `assets/manifests/` and the dashboard from `assets/web/`. Distributed builds synchronize the catalog from GitHub at startup and cache it in `%APPDATA%\packwire\manifests`; the dashboard is bundled with the release.
 
 ## Verify the installation
 

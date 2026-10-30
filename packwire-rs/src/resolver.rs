@@ -12,7 +12,7 @@ use crate::models::Manifest;
 
 pub type ResolverResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
-const USER_AGENT: &str = "Packwire/1.0.0 (Rust)";
+const USER_AGENT: &str = "Packwire/1.2.0 (Rust)";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolvedAsset {

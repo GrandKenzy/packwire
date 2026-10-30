@@ -5,7 +5,7 @@
 ; =====================================================================
 
 #define MyAppName "Packwire"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Packwire Team"
 #define MyAppURL "https://github.com/GrandKenzy/packwire"
 #define MyAppExeName "packwire.exe"
@@ -48,7 +48,6 @@ Name: "addtopath"; Description: "Añadir Packwire a la variable de entorno PATH 
 Source: "{#BuildDir}\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#BuildDir}\{#MyAppGuiExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\web\*"; DestDir: "{app}\web"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "assets\manifests\*.json"; DestDir: "{app}\manifests"; Flags: ignoreversion
 Source: "assets\web\front.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion isreadme
 

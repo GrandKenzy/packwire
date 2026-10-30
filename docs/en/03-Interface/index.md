@@ -1,6 +1,6 @@
 # 03. User Interface
 
-> **Current Version:** `1.0.0`
+> **Current Version:** `1.2.0`
 > **Engines:** Microsoft Edge WebView2 (Windows), WebKitGTK (Linux), Safari WebKit (macOS)
 
 This section documents Packwire's modern webview-based graphical frontend, its bidirectional IPC bridge, the fallback local HTTP server, and the dynamic CSS theming system.

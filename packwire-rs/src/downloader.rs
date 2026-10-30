@@ -13,7 +13,7 @@ pub type DownloadResult<T> = Result<T, Box<dyn Error + Send + Sync>>;
 pub type ProgressCallback<'a> = dyn Fn(u64, Option<u64>, f64) + Send + Sync + 'a;
 
 const BLOCK_SIZE: usize = 64 * 1024;
-const USER_AGENT: &str = "Packwire/1.0.0 (Windows; Rust)";
+const USER_AGENT: &str = "Packwire/1.2.0 (Windows; Rust)";
 
 /// Descargador que almacena los artefactos en un directorio de caché.
 #[derive(Debug, Clone)]

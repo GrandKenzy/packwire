@@ -17,7 +17,8 @@ La migración se completó. Packwire ya no contiene una implementación Python n
 | GUI, servidor local e IPC | `packwire-rs/src/gui.rs` |
 | Aplicaciones del sistema | `packwire-rs/src/system_apps.rs` |
 | Recursos web | `assets/web/` |
-| Catálogo de manifests | `assets/manifests/` |
+| Fuente del catálogo de manifests | `assets/manifests/` en GitHub |
+| Caché local del catálogo | `%APPDATA%\packwire\manifests` en Windows |
 
 ## Distribución
 
@@ -26,7 +27,7 @@ La migración se completó. Packwire ya no contiene una implementación Python n
 - `installer.iss`: instalador Windows con Inno Setup.
 - `.github/workflows/release.yml`: builds nativos para Windows, Linux y macOS.
 
-Los binarios se compilan con Cargo y los recursos se copian desde `assets/`. La compatibilidad de `installed.json`, `configs.json` y los manifiestos se mantiene para no romper instalaciones existentes.
+Los binarios se compilan con Cargo y la interfaz se copia desde `assets/web/`. La carpeta `assets/manifests/` permanece en el repositorio como fuente de catálogo, pero ya no se incluye en el instalador ni en el paquete portable: Packwire la sincroniza al abrirse y mantiene una caché local compatible con instalaciones existentes.
 
 ## Verificación
 

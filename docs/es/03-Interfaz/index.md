@@ -1,6 +1,6 @@
 # 03. Interfaz de Usuario
 
-> **Versión Actual:** `1.0.0`
+> **Versión Actual:** `1.2.0`
 > **Motor:** Microsoft Edge WebView2 (Windows), WebKitGTK (Linux), Safari WebKit (macOS)
 
 Esta sección documenta la arquitectura del frontend webview moderno de Packwire, su puente bidireccional IPC, el servidor HTTP de contingencia y el sistema dinámico de temas visuales.

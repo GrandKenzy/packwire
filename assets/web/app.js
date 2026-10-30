@@ -27,6 +27,7 @@ const API = {
   uninstall(id) { return this.call("uninstall", id); },
   update(id) { return this.call("update", id); },
   checkUpdates() { return this.call("check_updates"); },
+  getCatalogSync() { return this.call("get_catalog_sync"); },
   checkAppUpdate() { return this.call("check_app_update"); },
   listThemes() { return this.call("list_themes"); },
   getConfig(key) { return this.call("get_config", key); },
@@ -126,6 +127,11 @@ async function initApp() {
   await loadSystemInfo();
   await refreshCatalog();
   await refreshInstalled();
+
+  const catalogSync = await API.getCatalogSync();
+  if (catalogSync && catalogSync.success && catalogSync.updated) {
+    showToast(catalogSync.message, "info");
+  }
   
   // Detect updates in background as soon as app starts
   checkUpdatesInBackground();

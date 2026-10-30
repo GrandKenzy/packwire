@@ -1,6 +1,6 @@
 # 04. Packaging & Distribution
 
-> **Current Version:** `1.0.0`
+> **Current Version:** `1.2.0`
 > **Formats:** Native binaries, portable ZIP archives, and Inno Setup (.exe)
 
 This section covers all methods for deploying and packaging Packwire, from compiling standalone executables to automated installation scripts and system integration.

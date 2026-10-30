@@ -9,7 +9,7 @@ Packwire se distribuye como aplicación nativa. La integración del sistema se r
 - `packwire.exe`, la CLI nativa.
 - `packwirew.exe`, la GUI nativa sin consola.
 - `web/`, los recursos del dashboard.
-- `manifests/`, el catálogo de paquetes.
+- el catálogo sincronizado desde GitHub en `%APPDATA%\packwire\manifests`.
 - accesos directos con `assets/web/front.ico` como icono.
 - el directorio de Packwire en el PATH del usuario cuando se selecciona esa opción.
 

@@ -21,7 +21,7 @@ cargo test --manifest-path packwire-rs/Cargo.toml
 cargo build --release --manifest-path packwire-rs/Cargo.toml --bins
 ```
 
-El catálogo y el dashboard se leen desde `assets/manifests/` y `assets/web/`.
+En una compilación local, el catálogo fuente se lee desde `assets/manifests/` y el dashboard desde `assets/web/`. Las versiones distribuidas sincronizan el catálogo desde GitHub al iniciar y lo guardan en `%APPDATA%\packwire\manifests`; el dashboard sí se incluye en el paquete.
 
 ## Verificar la instalación
 

@@ -17,7 +17,7 @@ use semver::Version;
 use serde_json::{json, Map, Value};
 
 use crate::config::{load_config, paths, save_config, system, Paths};
-use crate::manifest::ManifestLoader;
+use crate::manifest::{sync_remote_catalog, ManifestLoader, ManifestSyncReport};
 use crate::models::PackageState;
 use crate::pather::Pather;
 use crate::state::{get_installed, load_state, unregister_installed};
@@ -35,6 +35,7 @@ pub struct GuiBridge {
     pub paths: Paths,
     loader: ManifestLoader,
     task_queue: Arc<TaskQueue>,
+    catalog_sync: ManifestSyncReport,
 }
 
 impl std::fmt::Debug for GuiBridge {
@@ -49,12 +50,17 @@ impl std::fmt::Debug for GuiBridge {
 
 impl GuiBridge {
     pub fn new(paths: Paths) -> GuiResult<Self> {
+        Self::new_with_catalog_sync(paths, ManifestSyncReport::cached())
+    }
+
+    fn new_with_catalog_sync(paths: Paths, catalog_sync: ManifestSyncReport) -> GuiResult<Self> {
         let loader = ManifestLoader::new(paths.manifests_dir.clone());
         let task_queue = Arc::new(TaskQueue::with_packwire(paths.clone(), 1)?);
         Ok(Self {
             paths,
             loader,
             task_queue,
+            catalog_sync,
         })
     }
 
@@ -127,6 +133,7 @@ impl GuiBridge {
             }
             "list_themes" => Ok(json!(self.list_themes())),
             "check_updates" => Ok(json!({})),
+            "get_catalog_sync" => Ok(serde_json::to_value(&self.catalog_sync)?),
             "check_app_update" => self.check_app_update(),
             "uninstall" => {
                 let package = required_string(args, 0, "package")?;
@@ -799,7 +806,9 @@ impl Drop for LocalServer {
 /// Wry/TAO. `web_mode` conserva el fallback compatible con la interfaz web
 /// anterior para desarrollo y diagnóstico.
 pub fn launch_gui(web_mode: bool, port: u16) -> GuiResult<()> {
-    let bridge = GuiBridge::new(paths())?;
+    let paths = paths();
+    let catalog_sync = sync_remote_catalog(&paths.manifests_dir);
+    let bridge = GuiBridge::new_with_catalog_sync(paths, catalog_sync)?;
     let server = LocalServer::start(port, bridge)?;
     if web_mode {
         return launch_browser_gui(server);

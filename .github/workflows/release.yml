@@ -9,7 +9,7 @@ on:
       tag_name:
         description: "Etiqueta de la versión que se publicará"
         required: false
-        default: "v1.0.0"
+        default: "v1.2.0"
 
 permissions:
   contents: write
@@ -34,14 +34,11 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           New-Item -ItemType Directory -Force -Path dist\packwire-windows-x64\web | Out-Null
-          New-Item -ItemType Directory -Force -Path dist\packwire-windows-x64\manifests | Out-Null
-
           Copy-Item packwire-rs\target\release\packwire.exe dist\packwire.exe -Force
           Copy-Item packwire-rs\target\release\packwirew.exe dist\packwirew.exe -Force
           Copy-Item dist\packwire.exe dist\packwire-windows-x64\packwire.exe -Force
           Copy-Item dist\packwirew.exe dist\packwire-windows-x64\packwirew.exe -Force
           Copy-Item assets\web\* dist\packwire-windows-x64\web -Recurse -Force
-          Copy-Item assets\manifests\*.json dist\packwire-windows-x64\manifests -Force
           Copy-Item README.md dist\packwire-windows-x64\README.md -Force
 
           Compress-Archive `
@@ -102,7 +99,7 @@ jobs:
           if [ "${{ github.ref_type }}" = "tag" ]; then
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           else
-            echo "tag=${{ github.event.inputs.tag_name || 'v1.0.0' }}" >> "$GITHUB_OUTPUT"
+            echo "tag=${{ github.event.inputs.tag_name || 'v1.2.0' }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Publicar release de Windows

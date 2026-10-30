@@ -7,7 +7,7 @@ Packwire uses [`installer.iss`](../../../installer.iss) to generate `Packwire-Se
 - `packwire.exe`: native CLI.
 - `packwirew.exe`: windowed GUI without a console.
 - `web/`: dashboard frontend.
-- `manifests/`: package catalog.
+- The catalog is synchronized from `assets/manifests/` on GitHub at startup and cached in `%APPDATA%\packwire\manifests` for offline use.
 - `front.ico`: Packwire icon for shortcuts and the uninstaller.
 
 The default destination is `{localappdata}\Programs\Packwire`, so administrator privileges are not required. The installer can add the application directory to the user PATH and creates Start Menu and optional Desktop shortcuts.

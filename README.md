@@ -19,6 +19,7 @@ Su objetivo es simplificar la preparación de un equipo nuevo: Packwire reúne e
 - Descargas en segundo plano con consola oculta cuando la instalación lo permite.
 - Gestión de accesos y shims para facilitar el uso de las herramientas instaladas.
 - Verificación de actualizaciones de Packwire.
+- Catálogo de manifests remoto, actualizado automáticamente desde GitHub y disponible offline mediante caché local.
 
 ## Contenido del catálogo
 
@@ -39,7 +40,7 @@ Para Windows están disponibles:
 - **Instalador:** configura Packwire y crea sus accesos directos.
 - **Versión portable:** permite ejecutar Packwire sin instalación.
 
-La versión actual es **1.0.0**.
+La versión actual es **1.2.0**.
 
 ## Uso
 
@@ -66,7 +67,7 @@ packwire info python
 | Característica | Detalle |
 |---|---|
 | Nombre | Packwire |
-| Versión estable | 1.0.0 |
+| Versión estable | 1.2.0 |
 | Plataforma principal | Windows |
 | Interfaz | GUI nativa y CLI |
 | Catálogo | Herramientas, lenguajes, runtimes, utilidades y sistemas operativos |

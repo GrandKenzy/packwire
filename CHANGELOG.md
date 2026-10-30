@@ -2,6 +2,29 @@
 
 Todos los cambios importantes de Packwire se documentan aquí.
 
+## [1.2.0] - 2026-10-29
+
+### Añadido
+
+- Catálogo remoto de manifests sincronizado desde `assets/manifests/` del repositorio oficial de Packwire en GitHub.
+- Caché local del catálogo para mantener el funcionamiento offline después de una sincronización correcta.
+- Actualización automática del catálogo al abrir la GUI o iniciar la CLI.
+- API local `get_catalog_sync` para informar a la interfaz si el catálogo se actualizó.
+
+### Cambiado
+
+- Los manifests ya no se empaquetan dentro del instalador ni de la versión portable.
+- Los manifests remotos prevalecen sobre cualquier catálogo de desarrollo local y se eliminan del caché cuando dejan de existir en GitHub.
+
+## [1.1.0] - 2026-10-29
+
+### Añadido
+
+- Manifest de NASM para ensamblado x86/x86-64 mediante WinGet.
+- Manifest de GNU Binutils para exponer GAS (`as.exe`) en MSYS2 UCRT64.
+- Manifest de QEMU para emulación y virtualización desde MSYS2 UCRT64.
+- Alias de búsqueda para NASM, GAS, Binutils y QEMU.
+
 ## [1.0.0] - 2026-10-27
 
 ### Estable

@@ -1,6 +1,6 @@
 # 05. Reference & Diagnostics
 
-> **Current Version:** `1.0.0`
+> **Current Version:** `1.2.0`
 > **Compatibility:** Native Rust and the system WebView2/WebKit runtime
 
 Comprehensive technical reference for the Command-Line Interface (CLI), diagnostics and error catalog, Linux distribution guide, and local hardware telemetry privacy plan.

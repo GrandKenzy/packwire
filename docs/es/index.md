@@ -1,6 +1,6 @@
 # Documentación del Proyecto Packwire
 
-> **Versión:** `1.0.0`
+> **Versión:** `1.2.0`
 > **Implementación:** Rust nativo (Windows, Linux, macOS)
 > **Licencia:** MIT  
 

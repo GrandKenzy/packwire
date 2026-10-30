@@ -9,7 +9,7 @@ Packwire is distributed as a native Rust application. System integration is hand
 - `packwire.exe`, the native CLI.
 - `packwirew.exe`, the windowed GUI.
 - `web/`, the dashboard resources.
-- `manifests/`, the package catalog.
+- the catalog synchronized from GitHub into `%APPDATA%\packwire\manifests`.
 - Start Menu and optional Desktop shortcuts using the Packwire icon.
 - The application directory in the user PATH when selected.
 

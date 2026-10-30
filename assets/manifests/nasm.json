@@ -1,0 +1,21 @@
+{
+  "$schema": "packwire-v1",
+  "id": "nasm",
+  "name": "NASM",
+  "aliases": ["nasm", "netwide assembler", "assembler x86"],
+  "icon": "⚙️",
+  "type": "stable",
+  "category": "compilers",
+  "description": "Ensamblador Netwide para desarrollar software x86 y x86-64.",
+  "upstream": {"source": "winget", "id": "NASM.NASM"},
+  "install": {
+    "mode": "command",
+    "command": {
+      "windows": "if (-not (Get-Command winget -ErrorAction SilentlyContinue)) { throw 'winget no está disponible; abre el sitio oficial para instalar NASM.' }; winget install --id NASM.NASM -e --source winget --accept-source-agreements --accept-package-agreements",
+      "binaries": ["nasm.exe"],
+      "elevated": true
+    },
+    "site": {"url": "https://www.nasm.us/"},
+    "clean": true
+  }
+}

@@ -1,6 +1,6 @@
 # 02. Core Modules
 
-> **Current Version:** `1.0.0`
+> **Current Version:** `1.2.0`
 > **Core:** `packwire-rs/src/`
 
 The Core Modules section describes Packwire's internal contracts, dynamic version resolution engine, and deployment modes implemented in Rust.

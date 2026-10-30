@@ -6,3 +6,12 @@ hide = [
   "packwirew.exe",
   "SHA256SUMS.txt",
 ]
+
+[v1.2.0]
+hide = [
+  "Packwire-Setup-v1.2.0.exe",
+  "packwire-windows-x64.zip",
+  "packwire.exe",
+  "packwirew.exe",
+  "SHA256SUMS.txt",
+]
